@@ -1,7 +1,7 @@
 from datetime import time,date
 from sqlalchemy import Integer,String, ForeignKey,Text,Time,Date
 from sqlalchemy.orm import mapped_column,Mapped,relationship
-from database import Base
+from src.database import Base
 
 
 
@@ -10,7 +10,7 @@ class MasterModel(Base):
     
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
     id_user : Mapped[int] = mapped_column(Integer,ForeignKey("users.id"), nullable= False)
-    bio : Mapped[str] = mapped_column(Text(300))
+    bio : Mapped[str] = mapped_column(Text())
 
     specialization : Mapped[list["SpecializationModel"]] = relationship(secondary="specialization_master", back_populates="masters") #type: ignore
     work_days : Mapped[list["WorkDayModel"]] = relationship(back_populates="master",cascade="all, delete-orphan")
@@ -21,7 +21,7 @@ class SpecializationModel(Base):
     __tablename__ = "specialization_master"
 
     id_master : Mapped[int] = mapped_column(Integer,ForeignKey("master.id", ondelete="CASCADE"), primary_key= True)
-    name : Mapped[str] = mapped_column(String(100), ForeignKey("service.name", ondelete="CASCADE"))
+    id_service : Mapped[int] = mapped_column(Integer, ForeignKey("service.id", ondelete="CASCADE"))
 
 
 class WorkDayModel(Base):

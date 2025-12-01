@@ -1,6 +1,6 @@
 from sqlalchemy import Integer,String,CheckConstraint,Enum
 from sqlalchemy.orm import mapped_column,Mapped,relationship
-from database import Base
+from src.database import Base
 from src.models.enum import CategoryEnum
 
 

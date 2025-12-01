@@ -1,0 +1,1 @@
+docker run --name hub_db -p 6432:5432 -e POSTGRES_USER=momiai -e POSTGRES_PASSWORD=1 -e POSTGRES_DB=hubdb -d postgres:17.6

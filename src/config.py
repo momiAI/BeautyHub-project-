@@ -16,7 +16,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES : int
 
     @property
-    def d_url(self):
+    def db_url(self):
         return f"postgresql+asyncpg://{self.DB_USER}:{self.DB_PASS}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
     
     model_config = SettingsConfigDict(env_file=".env")

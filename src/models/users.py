@@ -1,4 +1,4 @@
-from database import Base
+from src.database import Base
 from sqlalchemy import Integer,String,Enum,ForeignKey
 from sqlalchemy.orm import Mapped,mapped_column,relationship
 from src.models.enum import UserRoleEnum
