@@ -15,5 +15,6 @@ class UsersModel(Base):
 class UserRatingModel(Base):
     __tablename__ = "user_rating"
 
-    id_user : Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key= True)
-    rating : Mapped[int]
+    id_from: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    id_to: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
+    rating: Mapped[int]
