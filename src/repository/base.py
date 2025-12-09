@@ -13,7 +13,7 @@ class BaseRep:
         self.session = session
 
     async def create(self,data : BaseModel):
-        result = await self.session.execute(insert(self.model).values(**data.model_dump()))
+        result = await self.session.execute(insert(self.model).values(**data.model_dump()).returning(self.model))
         return self.schema.model_validate(result.scalar_one())
 
     async def delete_by_id(self,id : int):

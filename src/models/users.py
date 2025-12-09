@@ -10,7 +10,7 @@ class UsersModel(Base):
     phone : Mapped[str] = mapped_column(String(20),unique=True)
     name : Mapped[str] = mapped_column(String(50))
     password_hash : Mapped[str]
-    role : Mapped[str] = mapped_column(Enum(UserRoleEnum))
+    role : Mapped[str] = mapped_column(Enum(UserRoleEnum,native_enum=False))
 
 class UserRatingModel(Base):
     __tablename__ = "user_rating"

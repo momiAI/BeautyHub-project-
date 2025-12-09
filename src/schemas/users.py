@@ -6,12 +6,14 @@ class Rating(BaseModel):
     id_to : int
     rating : int 
 
-class User(BaseModel):
-    id : int
+class UserDB(BaseModel):
     phone : str
     name : str
     password_hash : str
     role : str
+
+class User(UserDB):
+    id : int
     rating : list[Rating] = []
 
 class UserCreate(BaseModel):

@@ -2,9 +2,9 @@ MODE = LOCAL
 
 DB_NAME = beautyhub
 DB_HOST = beautyhub_db
-DB_PORT = 6432
+DB_PORT = 5432
 DB_USER = postgres
-DB_PASS = 1
+DB_PASS = abcde1234
 
 JWT_SECRET_KEY = "848281dffe5bd7fbc1ccfb2d7d431645"
 JWT_ALGORITHM = "HS256"

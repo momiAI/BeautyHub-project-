@@ -11,7 +11,7 @@ class ServiceModel(Base):
     name : Mapped[str] = mapped_column(String(100))
     price : Mapped[int]
     duration_minutes : Mapped[int] 
-    category : Mapped[str] = mapped_column(Enum(CategoryEnum))
+    category : Mapped[str] = mapped_column(Enum(CategoryEnum,native_enum=False))
 
     masters : Mapped[list["MasterModel"]] = relationship(secondary="specialization_master",back_populates="specialization") # type: ignore 
 

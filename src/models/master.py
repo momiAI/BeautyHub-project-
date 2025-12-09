@@ -1,5 +1,5 @@
 from datetime import time,date
-from sqlalchemy import Integer,String, ForeignKey,Text,Time,Date
+from sqlalchemy import Integer,String, ForeignKey,Text,Time,Date,Table,Column
 from sqlalchemy.orm import mapped_column,Mapped,relationship
 from src.database import Base
 
@@ -12,17 +12,17 @@ class MasterModel(Base):
     id_user : Mapped[int] = mapped_column(Integer,ForeignKey("users.id"), nullable= False)
     bio : Mapped[str] = mapped_column(Text())
 
-    specialization : Mapped[list["SpecializationModel"]] = relationship(secondary="specialization_master", back_populates="masters") #type: ignore
+    specialization : Mapped[list["ServiceModel"]] = relationship(secondary="specialization_master", back_populates="masters") #type: ignore
     work_days : Mapped[list["WorkDayModel"]] = relationship(back_populates="master",cascade="all, delete-orphan")
     day_offs : Mapped[list["DayOffModel"]] = relationship(back_populates="master", cascade="all, delete-orphan")
 
 
-class SpecializationModel(Base):
-    __tablename__ = "specialization_master"
-
-    id_master : Mapped[int] = mapped_column(Integer,ForeignKey("master.id", ondelete="CASCADE"), primary_key= True)
-    id_service : Mapped[int] = mapped_column(Integer, ForeignKey("service.id", ondelete="CASCADE"))
-
+master_specialization_table = Table(
+    "specialization_master",
+    Base.metadata,
+    Column("master_id", ForeignKey("master.id", ondelete="CASCADE"), primary_key=True),
+    Column("service_id", ForeignKey("service.id", ondelete="CASCADE"), primary_key=True)
+)
 
 class WorkDayModel(Base):
     __tablename__ = "timetable"

@@ -1,4 +1,16 @@
 services:
+  app_back_service:
+    container_name: "beautyhub_back"
+
+    build: .
+
+    ports:
+      - 7777:8000
+    networks:
+      - appNetwork
+    env_file:
+      - .envdocker
+      
   app_db_service:
     container_name: "beautyhub_db"
     image: postgres:17.6
