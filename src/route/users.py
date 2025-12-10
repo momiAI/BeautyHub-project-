@@ -48,7 +48,7 @@ async def user_login(db : DbDep, response : Response, data : UserLogin = Body(op
 
 
 @router.post("/logout", summary="Удаление куков, выход")
-async def user_logout(db : DbDep, response : Response):
+async def user_logout(response : Response):
     response.delete_cookie("access_token")
     return {"message" : "OK"}
 
