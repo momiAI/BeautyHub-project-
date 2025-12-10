@@ -5,48 +5,61 @@ from pwdlib import PasswordHash
 
 from src.schemas.users import UserDB,UserCreate
 from src.models.enum import UserRoleEnum
-from src.utils.exceptions import IncorectPhone
+from src.utils.exceptions import IncorectPhone,IncorectToken,TokenTimeIsOver
 from src.config import settings
 
 password_hash = PasswordHash.recommended()
 
+class UserUtils:
 
-async def validate_phone(phone : str):
-    PHONE_RE = re.compile(r'^7\d{10}$')
-    digits = re.sub(r'\D', '', phone)
-    if digits.startswith('8'):
-        digits = '7' + digits[1:]
-    if bool(PHONE_RE.fullmatch(digits)):
-        return digits
-    else:
-        raise IncorectPhone 
-
-async def create_access_token(data: dict, expires_delta: timedelta | None = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
-    return encoded_jwt
+    def decode_token(self,token : str):
+        try:
+            return jwt.decode(
+                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+            )
+        except jwt.exceptions.DecodeError:
+            raise IncorectToken
+        except jwt.exceptions.ExpiredSignatureError:
+            raise TokenTimeIsOver
 
 
-def verify_password(plain_password, hashed_password):
-    return password_hash.verify(plain_password, hashed_password)
+    def validate_phone(self,phone : str):
+        PHONE_RE = re.compile(r'^7\d{10}$')
+        digits = re.sub(r'\D', '', phone)
+        if digits.startswith('8'):
+            digits = '7' + digits[1:]
+        if bool(PHONE_RE.fullmatch(digits)):
+            return digits
+        else:
+            raise IncorectPhone 
+
+    def create_access_token(self,data: dict, expires_delta: timedelta | None = None):
+        to_encode = data.copy()
+        if expires_delta:
+            expire = datetime.now(timezone.utc) + expires_delta
+        else:
+            expire = datetime.now(timezone.utc) + timedelta(minutes=15)
+        to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+        return encoded_jwt
 
 
-async def hasheed_password(password):
-    return password_hash.hash(password)
+    def verify_password(self,plain_password, hashed_password):
+        return password_hash.verify(plain_password, hashed_password)
 
 
-async def converts_data(data : UserCreate):
-    phone = await validate_phone(data.phone)
-    return UserDB(
-        phone = phone,
-        name = data.name,
-        password_hash = await hasheed_password(data.password),
-        role = UserRoleEnum.CLIENT,
-        rating = []
-    )
-    
+    def hasheed_password(self,password):
+        return password_hash.hash(password)
+
+
+    def converts_data(self,data : UserCreate):
+        phone = self.validate_phone(data.phone)
+        return UserDB(
+            phone = phone,
+            name = data.name,
+            password_hash = self.hasheed_password(data.password),
+            role = UserRoleEnum.CLIENT,
+            rating = []
+        )
+
+user_utils = UserUtils()

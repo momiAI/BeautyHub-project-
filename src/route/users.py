@@ -1,12 +1,20 @@
 from fastapi import APIRouter,Body,HTTPException,Response
 
-from src.route.dependency import DbDep
+from src.route.dependency import DbDep,UserDep
 from src.schemas.users import UserCreate,UserLogin
 from src.service.users import UsersService
 from src.utils.exceptions import IncorectPhone, UserUniqueError, UserNoFound,IncorectData
 
 
 router = APIRouter(prefix='/users', tags=["Пользователи"])
+
+
+@router.get("/me",summary="Получение пользователя")
+async def user_me(db : DbDep, user : UserDep):
+    result = await UsersService(db).get_user_me(user.user_id)
+    return {"data" : result }
+
+
 
 @router.post("/create",summary="Создание пользователя")
 async def user_create(db : DbDep,data : UserCreate = Body(openapi_examples={"1" : {

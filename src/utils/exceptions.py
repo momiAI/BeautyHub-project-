@@ -24,3 +24,9 @@ class NoFound(CustomException):
 
 class UserNoFound(NoFound):
     detail = "Пользователь не найден."
+
+class IncorectToken(IncorectData):
+    detail = "Неверный токен"
+
+class TokenTimeIsOver(CustomException):
+    detail = "Время токена вышло"

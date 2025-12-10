@@ -24,3 +24,8 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     phone : str
     password : str 
+
+class UserDepSchema(BaseModel):
+    user_id: int 
+    role : str
+    exp : int
