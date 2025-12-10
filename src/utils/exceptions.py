@@ -18,3 +18,9 @@ class UniqueError(CustomException):
 
 class UserUniqueError(UniqueError):
     detail = "Пользователь уже существует."
+
+class NoFound(CustomException):
+    detail = "Объект не найден"
+
+class UserNoFound(NoFound):
+    detail = "Пользователь не найден."
