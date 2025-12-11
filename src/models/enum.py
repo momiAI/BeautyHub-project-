@@ -26,3 +26,13 @@ class ReceptionStatusEnum(Enum):
     RESCHEDULED = "rescheduled"
     AWAITING_PAYMENT = "awaiting_payment"
     REFUNDED = "refunded"
+
+
+class WeekDay(Enum):
+    monday = "monday"
+    tuesday = "tuesday"
+    wednesday = "wednesday"
+    thursday = "thursday"
+    friday = "friday"
+    saturday = "saturday"
+    sunday = "sunday"

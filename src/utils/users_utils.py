@@ -71,7 +71,7 @@ class UserUtils:
             phone = phone,
             name = data.name,
             password_hash = self.hasheed_password(data.password),
-            role = UserRoleEnum.CLIENT,
+            role = UserRoleEnum.CLIENT.value,
             rating = []
         )
 

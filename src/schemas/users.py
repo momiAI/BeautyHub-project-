@@ -10,7 +10,7 @@ class UserDB(BaseModel):
     phone : str
     name : str
     password_hash : str
-    role : UserRoleEnum
+    role : str
 
 class User(UserDB):
     id : int
