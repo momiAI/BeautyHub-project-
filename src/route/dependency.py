@@ -17,7 +17,7 @@ async def get_token(request : Request):
 
 async def get_user(token : str = Depends(get_token)):
     try:
-        user = user_utils.decode_token(token)
+        user = user_utils.decode_token(access_token=token)
         return UserDepSchema.model_validate(user)
     except IncorectToken:
         raise HTTPException(status_code=401, detail="Неверный токен")

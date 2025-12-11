@@ -1,7 +1,7 @@
 from src.service.base import BaseService
 from src.schemas.users import UserCreate,UserLogin
 from src.utils.users_utils import user_utils
-from src.utils.exceptions import UniqueError,UserUniqueError,IncorectPhone,NoFound,UserNoFound,IncorectData
+from src.utils.exceptions import UniqueError,UserUniqueError,IncorectPhone,NoFound,UserNoFound,IncorectData,IncorectToken
 
 
 class UsersService(BaseService):
@@ -15,18 +15,29 @@ class UsersService(BaseService):
             user = await self.db.user.get_object(phone = user_utils.validate_phone(data.phone))
             if user_utils.verify_password(data.password, user.password_hash) is False:
                 raise IncorectData
-            acces_token = user_utils.create_access_token(
+            access_token = user_utils.create_access_token(
                 {
                 "user_id" : user.id,
                 "role" : user.role.value
                 }
             )
-            return acces_token
+            refresh_token = user_utils.create_refresh_token(
+                {
+                "user_id" : user.id,
+                "role" : user.role.value
+                }
+            )
+            return access_token,refresh_token
         except NoFound:
             raise UserNoFound
         except IncorectPhone:
             raise IncorectPhone
 
+    async def refresh_cookies(self,refresh_token):
+        data = user_utils.decode_token(refresh_token=refresh_token)
+        if data['type'] != 'refresh':
+            raise IncorectToken
+        return user_utils.create_access_token(data)
 
     async def create_user(self, data : UserCreate):
         try:

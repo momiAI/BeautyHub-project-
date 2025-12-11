@@ -5,18 +5,25 @@ from pwdlib import PasswordHash
 
 from src.schemas.users import UserDB,UserCreate
 from src.models.enum import UserRoleEnum
-from src.utils.exceptions import IncorectPhone,IncorectToken,TokenTimeIsOver
+from src.utils.exceptions import IncorectPhone,IncorectToken,TokenTimeIsOver,TokenDublicate
 from src.config import settings
 
 password_hash = PasswordHash.recommended()
 
 class UserUtils:
 
-    def decode_token(self,token : str):
+    def decode_token(self,access_token : str | None = None, refresh_token : str | None = None):
         try:
-            return jwt.decode(
-                token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
-            )
+            if access_token:
+                return jwt.decode(
+                    access_token, settings.JWT_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+                )
+            elif refresh_token:
+                return jwt.decode(
+                    refresh_token, settings.REFRESH_SECRET_KEY, algorithms=[settings.JWT_ALGORITHM]
+                )
+            else:
+                raise TokenDublicate
         except jwt.exceptions.DecodeError:
             raise IncorectToken
         except jwt.exceptions.ExpiredSignatureError:
@@ -39,10 +46,16 @@ class UserUtils:
             expire = datetime.now(timezone.utc) + expires_delta
         else:
             expire = datetime.now(timezone.utc) + timedelta(minutes=15)
-        to_encode.update({"exp": expire})
+        to_encode.update({"exp": expire, "type" : "access"})
         encoded_jwt = jwt.encode(to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
         return encoded_jwt
 
+    def create_refresh_token(self,data: dict, expires_delta: timedelta = timedelta(days=30)):
+        to_encode = data.copy()
+        expire = datetime.now(timezone.utc) + expires_delta
+        to_encode.update({"exp": expire, "type" : "refresh"})
+        encoded_jwt = jwt.encode(to_encode, settings.REFRESH_SECRET_KEY, algorithm=settings.JWT_ALGORITHM)
+        return encoded_jwt
 
     def verify_password(self,plain_password, hashed_password):
         return password_hash.verify(plain_password, hashed_password)

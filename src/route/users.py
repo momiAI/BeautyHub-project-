@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Body,HTTPException,Response
+from fastapi import APIRouter,Body,HTTPException,Response,Cookie
 
 from src.route.dependency import DbDep,UserDep
 from src.schemas.users import UserCreate,UserLogin
@@ -44,8 +44,9 @@ async def user_login(db : DbDep, response : Response, data : UserLogin = Body(op
     }
 }})):
     try:
-        access_token =  await UsersService(db).login_user(data)
-        response.set_cookie("access_token",access_token)
+        access_token,refresh_token =  await UsersService(db).login_user(data)
+        response.set_cookie("access_token",access_token,httponly = True)
+        response.set_cookie("refresh_token",refresh_token,httponly = True)
         return {"message" : "OK"}
     except UserNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
@@ -54,6 +55,11 @@ async def user_login(db : DbDep, response : Response, data : UserLogin = Body(op
     except IncorectData as exc:
         raise HTTPException(status_code=400, detail=exc.detail)
 
+@router.post("/refresh", summary="Обновление куков")
+async def refresh_cookies(response : Response, refresh_token : str = Cookie(None)):
+    new_access_token = await UsersService().refresh_cookies(refresh_token)
+    response.set_cookie("access_token",new_access_token,httponly=True)
+    return {"message" : "OK"}
 
 @router.post("/logout", summary="Удаление куков, выход")
 async def user_logout(response : Response):

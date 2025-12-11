@@ -30,3 +30,6 @@ class IncorectToken(IncorectData):
 
 class TokenTimeIsOver(CustomException):
     detail = "Время токена вышло"
+
+class TokenDublicate(CustomException):
+    detail = "Функция принимает только один токен!"
