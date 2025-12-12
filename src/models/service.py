@@ -13,5 +13,5 @@ class ServiceModel(Base):
     duration_minutes : Mapped[int] 
     category : Mapped[str] = mapped_column(Enum(CategoryEnum,native_enum=False))
 
-    masters : Mapped[list["MasterModel"]] = relationship(secondary="specialization_master",back_populates="specialization") # type: ignore 
+    master : Mapped[list["MasterModel"]] = relationship(secondary="specialization_master",back_populates="specialization") # type: ignore 
 

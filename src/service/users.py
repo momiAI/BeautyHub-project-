@@ -18,13 +18,13 @@ class UsersService(BaseService):
             access_token = user_utils.create_access_token(
                 {
                 "user_id" : user.id,
-                "role" : user.role.value
+                "role" : user.role
                 }
             )
             refresh_token = user_utils.create_refresh_token(
                 {
                 "user_id" : user.id,
-                "role" : user.role.value
+                "role" : user.role
                 }
             )
             return access_token,refresh_token

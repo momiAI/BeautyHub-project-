@@ -1,9 +1,9 @@
-from datetime import time,date
-from sqlalchemy import Integer, ForeignKey,Text,Time,Date,Table,Column,Enum,UniqueConstraint,String,ARRAY
+from datetime import time,date,datetime
+from sqlalchemy import Integer, ForeignKey,Text,Time,Date,Table,Column,Enum,UniqueConstraint,String,ARRAY,DateTime
 from sqlalchemy.orm import mapped_column,Mapped,relationship
 
 from src.database import Base
-from src.models.enum import WeekDay
+from src.models.enum import WeekDayEnum,MasterRequestStatusEnum
 
 
 
@@ -31,7 +31,7 @@ class WorkDayModel(Base):
 
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
     id_master : Mapped[int] = mapped_column(Integer, ForeignKey("master.id",ondelete="CASCADE"))
-    day_of_week: Mapped[WeekDay] = mapped_column(Enum(WeekDay,native_enum=False))  
+    day_of_week: Mapped[WeekDayEnum] = mapped_column(Enum(WeekDayEnum,native_enum=False))  
     start_time: Mapped[time] = mapped_column(Time())  
     end_time: Mapped[time] = mapped_column(Time())   
 
@@ -54,7 +54,9 @@ class MasterRequestModel(Base):
     __tablename__ = "masterrequest"
 
     id : Mapped[int] = mapped_column(Integer,primary_key=True)
-    id_user : Mapped[int] = mapped_column(Integer,ForeignKey("users.id", ondelete="CASCADE"))
+    id_user : Mapped[int] = mapped_column(Integer,ForeignKey("users.id", ondelete="CASCADE"),unique=True)
     bio_short : Mapped[str] = mapped_column(String(50))
     specializations : Mapped[list[str]] = mapped_column(ARRAY(String),nullable=False)
     portfolio : Mapped[list[str]] = mapped_column(ARRAY(String), nullable=True)
+    status : Mapped[MasterRequestStatusEnum] = mapped_column(Enum(MasterRequestStatusEnum,native_enum = False))
+    created_at : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=False)

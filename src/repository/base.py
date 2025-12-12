@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from sqlalchemy import insert,delete,select
+from sqlalchemy import insert,delete,select,update
 from sqlalchemy.exc import IntegrityError,NoResultFound
 
 from src.database import Base
@@ -19,6 +19,11 @@ class BaseRep:
             return self.schema.model_validate(result.scalar_one(),from_attributes=True)
         except NoResultFound:
             raise NoFound
+
+    async def update(self,id : int,values : BaseModel):
+        result = await self.session.execute(update(self.model).where(id == id).values(**values.model_dump()).returning(self.model))
+        return self.schema.model_validate(result.scalar_one(),from_attributes=True)
+
 
     async def create(self,data : BaseModel):
         try:

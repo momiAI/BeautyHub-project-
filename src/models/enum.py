@@ -1,6 +1,6 @@
 from enum import Enum
 
-class CategoryEnum(Enum):
+class CategoryEnum(str,Enum):
     FACE = 'face'
     HAIR = 'hair' 
     NAILS = 'nails' 
@@ -9,13 +9,13 @@ class CategoryEnum(Enum):
     DEPILATION = 'depilation'
 
 
-class UserRoleEnum(Enum):
+class UserRoleEnum(str,Enum):
     ADMIN = 'admin' 
     MASTER = 'master' 
     CLIENT = 'client'
 
 
-class ReceptionStatusEnum(Enum):
+class ReceptionStatusEnum(str,Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     IN_PROGRESS = "in_progress"
@@ -28,7 +28,7 @@ class ReceptionStatusEnum(Enum):
     REFUNDED = "refunded"
 
 
-class WeekDay(Enum):
+class WeekDayEnum(str,Enum):
     monday = "monday"
     tuesday = "tuesday"
     wednesday = "wednesday"
@@ -36,3 +36,10 @@ class WeekDay(Enum):
     friday = "friday"
     saturday = "saturday"
     sunday = "sunday"
+
+
+class MasterRequestStatusEnum(str, Enum):
+    PENDING = "pending"       
+    APPROVED = "approved"    
+    REJECTED = "rejected"     
+    IN_PROGRESS = "in_progress"  

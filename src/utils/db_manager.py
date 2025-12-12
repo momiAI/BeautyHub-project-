@@ -1,5 +1,5 @@
 from src.repository.users import UsersRepository
-
+from src.repository.master import MasterRepository,MasterRequestRepository
 
 
 class DbManager:
@@ -10,6 +10,8 @@ class DbManager:
         self.session = self.session_factory()
 
         self.user = UsersRepository(self.session)
+        self.master = MasterRepository(self.session)
+        self.master_request = MasterRequestRepository(self.session)
 
         return self
 
