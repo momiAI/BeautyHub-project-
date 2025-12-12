@@ -1,5 +1,5 @@
 from datetime import time,date
-from sqlalchemy import Integer, ForeignKey,Text,Time,Date,Table,Column,Enum,UniqueConstraint
+from sqlalchemy import Integer, ForeignKey,Text,Time,Date,Table,Column,Enum,UniqueConstraint,String,ARRAY
 from sqlalchemy.orm import mapped_column,Mapped,relationship
 
 from src.database import Base
@@ -55,3 +55,6 @@ class MasterRequestModel(Base):
 
     id : Mapped[int] = mapped_column(Integer,primary_key=True)
     id_user : Mapped[int] = mapped_column(Integer,ForeignKey("users.id", ondelete="CASCADE"))
+    bio_short : Mapped[str] = mapped_column(String(50))
+    specializations : Mapped[list[str]] = mapped_column(ARRAY(String),nullable=False)
+    portfolio : Mapped[list[str]] = mapped_column(ARRAY(String), nullable=True)
