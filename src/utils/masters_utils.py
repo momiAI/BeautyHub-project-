@@ -1,7 +1,7 @@
 from datetime import datetime,timezone
 
 from src.utils.exceptions import MasterRequestCooldownError,MasterRequestUniqueError,CancleRequestAndColldownError,MasterRequestAlreadyInProgressError
-from src.schemas.masters import MasterConvertRequestSchema,MasterCreateRequestSchema,MasterRequestSchema
+from src.schemas.masters import MasterConvertRequestSchema,MasterCreateRequestSchema,MasterRequestSchema,MasterDBSchema
 from src.models.enum import MasterRequestStatusEnum
 
 
@@ -13,6 +13,12 @@ class MastersUtils:
                                           status=MasterRequestStatusEnum.PENDING, 
                                           created_at=datetime.now().replace(second=0, microsecond=0),
                                           **data.model_dump())
+    
+    def converts_application(self, data : MasterRequestSchema ):
+        return MasterDBSchema(
+            id_user= data.id_user,
+            bio=data.bio_short
+        )
     
     def check_application(self,application : MasterRequestSchema):
         delta = datetime.now(timezone.utc) - application.created_at

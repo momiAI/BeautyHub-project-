@@ -27,3 +27,7 @@ class MastersService(BaseService):
 
         return await self.db.master_request.create(data_update)
         
+
+    async def confirm(self, id : int):
+        application = master_utils.converts_application(await self.db.master_request.get_object(id = id))
+        return await self.db.master.create(application)

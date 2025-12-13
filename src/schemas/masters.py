@@ -17,6 +17,10 @@ class MasterSchema(BaseModel):
     day_offs : list[DayOffSchema]
 
 
+class MasterDBSchema(BaseModel):
+    id_user : int
+    bio : str
+
 class MasterCreateRequestSchema(BaseModel):
     bio_short : str
     specializations : list[str]
