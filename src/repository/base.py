@@ -21,7 +21,7 @@ class BaseRep:
             raise NoFound
 
     async def update(self,id : int,values : BaseModel):
-        result = await self.session.execute(update(self.model).where(id == id).values(**values.model_dump()).returning(self.model))
+        result = await self.session.execute(update(self.model).where(self.model.id == id).values(**values.model_dump()).returning(self.model))
         return self.schema.model_validate(result.scalar_one(),from_attributes=True)
 
 

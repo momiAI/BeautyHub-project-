@@ -22,6 +22,15 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
+class MasterNoFound(NoFound):
+    detail = "Мастер не найден."
+
+class ApplicationNoFound(NoFound):
+    detail = "Заявка не найдена."
+
+class ApplicationApproved(CustomException):
+    detail = "Заявка подтверждена"
+
 class UserNoFound(NoFound):
     detail = "Пользователь не найден."
 
@@ -48,3 +57,6 @@ class MasterRequestUniqueError(UniqueError):
 
 class MasterRequestAlreadyInProgressError(UniqueError):
     detail = "Вы уже отправили заявку. Дождитесь обработки текущей."
+
+class RoleNotAllowedError(CustomException):
+    detail = "Не подходящая роль"

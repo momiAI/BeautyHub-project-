@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from src.models.enum import MasterRequestStatusEnum
+from src.models.enum import MasterRequestStatusEnum,CategoryEnum
 from src.schemas.service import ServiceSchemas
 from src.schemas.dayoff import DayOffSchema
-from src.schemas.workday import WorkDaySchema
+from src.schemas.workday import WorkDaySchema,WeekDayEnum
 
 
 class MasterSchema(BaseModel):
@@ -12,9 +12,17 @@ class MasterSchema(BaseModel):
     id_user : int
     bio : str
 
-    specialization : list[ServiceSchemas]
-    work_days : list[WorkDaySchema]
-    day_offs : list[DayOffSchema]
+
+class MasterDetailSchema(MasterSchema):
+    specialization : list[ServiceSchemas] 
+    work_days : list[WorkDaySchema] 
+    day_offs : list[DayOffSchema] 
+
+
+class MasterUpdateSchema(BaseModel): 
+    bio : str | None = None
+    specializatin : list[CategoryEnum] | None = None
+    work_day : list[WeekDayEnum] | None = None
 
 
 class MasterDBSchema(BaseModel):
@@ -33,6 +41,10 @@ class MasterConvertRequestSchema(MasterCreateRequestSchema):
 
 class MasterRequestSchema(MasterConvertRequestSchema):
     id : int 
+
+class MasterRequestConfirmSchema(BaseModel):
+    status : MasterRequestStatusEnum = MasterRequestStatusEnum.APPROVED
+
 
 
 

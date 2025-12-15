@@ -1,6 +1,6 @@
 from src.repository.users import UsersRepository
-from src.repository.master import MasterRepository,MasterRequestRepository
-
+from src.repository.master import MasterRepository,MasterRequestRepository,WorkDayRepository,DayOffRepository
+from src.repository.service import ServiceRepository
 
 class DbManager:
     def __init__(self, session_factory):
@@ -10,8 +10,13 @@ class DbManager:
         self.session = self.session_factory()
 
         self.user = UsersRepository(self.session)
+
         self.master = MasterRepository(self.session)
         self.master_request = MasterRequestRepository(self.session)
+        self.workday = WorkDayRepository(self.session)
+        self.dayoff = DayOffRepository(self.session)
+
+        self.service = ServiceRepository(self.session)
 
         return self
 

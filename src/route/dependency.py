@@ -21,27 +21,19 @@ async def get_token(request : Request):
     return token
 
 
-async def get_user(token : str = Depends(get_token)):
-    try:
-        return UserDepSchema.model_validate(user_utils.decode_token(access_token=token))
-    except IncorectToken:
-        raise HTTPException(status_code=401, detail="Неверный токен")
-    except TokenTimeIsOver:
-        raise HTTPException(status_code=401, detail="Срок токена истек")
-
-
-async def get_admin(token : str = Depends(get_token)):
-    user =  UserDepSchema.model_validate(user_utils.decode_token(access_token=token))
-    try:
-        if user.role != UserRoleEnum.ADMIN:
-            raise HTTPException(status_code=403, detail="Недостаточно прав для выполнения запроса!")
-        else:
-            return UserDepSchema.model_validate(user)
-    except IncorectToken:
-        raise HTTPException(status_code=401, detail="Неверный токен")
-    except TokenTimeIsOver:
-        raise HTTPException(status_code=401, detail="Срок токена истек")
-
+def user_dependency(role : UserRoleEnum | None = None):
+    async def get_user(token : str = Depends(get_token)):
+        try: 
+            user =  UserDepSchema.model_validate(user_utils.decode_token(access_token=token))
+            if role:
+                if role != user.role:
+                    raise HTTPException(status_code=403, detail="Недостаточно прав для выполнения запроса!")
+            return user
+        except IncorectToken:
+            raise HTTPException(status_code=401, detail="Неверный токен")
+        except TokenTimeIsOver:
+            raise HTTPException(status_code=401, detail="Срок токена истек")
+    return  get_user
 
 async def get_db():
     async with DbManager(async_session_maker) as db:
@@ -52,5 +44,6 @@ async def get_db():
 
 
 DbDep = Annotated[DbManager, Depends(get_db)]
-UserDep = Annotated[UserDepSchema, Depends(get_user)]
-AdminDep = Annotated[UserDepSchema,Depends(get_admin)]
+UserDep = Annotated[UserDepSchema, Depends(user_dependency)]
+AdminDep = Annotated[UserDepSchema,Depends(user_dependency(UserRoleEnum.ADMIN))]
+MasterDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.MASTER))]

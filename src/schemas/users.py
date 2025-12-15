@@ -10,7 +10,10 @@ class UserDB(BaseModel):
     phone : str
     name : str
     password_hash : str
-    role : str
+    role : UserRoleEnum
+
+class UserUpdateMasterSchema(BaseModel):
+    role : UserRoleEnum = UserRoleEnum.MASTER
 
 class User(UserDB):
     id : int
@@ -27,5 +30,5 @@ class UserLogin(BaseModel):
 
 class UserDepSchema(BaseModel):
     user_id: int 
-    role : str
+    role : UserRoleEnum
     exp : int

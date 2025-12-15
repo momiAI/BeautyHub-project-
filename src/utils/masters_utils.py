@@ -19,7 +19,7 @@ class MastersUtils:
             id_user= data.id_user,
             bio=data.bio_short
         )
-    
+
     def check_application(self,application : MasterRequestSchema):
         delta = datetime.now(timezone.utc) - application.created_at
         if (application.status == MasterRequestStatusEnum.PENDING or application.status == MasterRequestStatusEnum.REJECTED) and delta.days < 3:
