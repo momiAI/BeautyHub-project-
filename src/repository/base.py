@@ -19,7 +19,7 @@ class BaseRep:
             return self.schema.model_validate(result.scalar_one(), from_attributes=True)
         except NoResultFound:
             raise NoFound
-
+    
     async def update(self, id: int, values: BaseModel):
         result = await self.session.execute(
             update(self.model)
@@ -42,7 +42,7 @@ class BaseRep:
     async def delete_by_id(self, id: int):
         try:
             result = await self.session.execute(
-                delete(self.model).where(id == id).returning(self.model)
+                delete(self.model).where(self.model.id == id).returning(self.model)
             )
             return self.schema.model_validate(result.scalar_one(), from_attributes=True)
         except NoResultFound:

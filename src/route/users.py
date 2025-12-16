@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException, Response, Cookie
 
-from src.route.dependency import DbDep, UserDep
+from src.route.dependency import DbDep, MeDep
 from src.schemas.users import UserCreate, UserLogin
 from src.service.users import UsersService
 from src.utils.exceptions import (
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/users", tags=["Пользователи"])
 
 
 @router.get("/me", summary="Получение пользователя")
-async def user_me(db: DbDep, user: UserDep):
+async def user_me(db: DbDep, user: MeDep):
     result = await UsersService(db).get_user_me(user.user_id)
     return {"data": result}
 

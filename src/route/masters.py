@@ -11,9 +11,16 @@ from src.utils.exceptions import (
     RoleNotAllowedError,
     ApplicationNoFound,
     ApplicationApproved,
+    MasterNoFound
 )
 
 router = APIRouter(prefix="/master", tags=["Мастера"])
+
+
+
+@router.get(path="/me",summary="Получение мастера")
+async def me(db : DbDep, master : MasterDep):
+    result = await MastersService(db).get_me()
 
 
 @router.post(path="/application", summary="Создание заявки на добавления мастера")
@@ -66,7 +73,7 @@ async def application(
 async def confirm_application(id: int, db: DbDep, admin: AdminDep):
     try:
         result = await MastersService(db).confirm(id)
-        await db.commit()
+        #await db.commit()
         return {"data": result}
     except ApplicationNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
@@ -84,7 +91,7 @@ async def update_master(
                 "summary": "Полные данные",
                 "value": {
                     "bio": "Cвоего дела",
-                    "specializations": [
+                    "specialization": [
                         "face",
                         "hair",
                         "nails",
@@ -106,4 +113,9 @@ async def update_master(
         }
     ),
 ):
-    result = await MastersService(db).patch(master.user_id, data)
+    try:
+        result = await MastersService(db).patch(master.user_id, data)
+        return {"data" : result}
+    except MasterNoFound as exc:
+        return HTTPException(status_code=404, detail = exc.detail)
+    

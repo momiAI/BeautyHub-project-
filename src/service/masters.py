@@ -49,14 +49,14 @@ class MastersService(BaseService):
 
     async def confirm(self, id: int):
         try:
-            application = master_utils.converts_application(
-                await self.db.master_request.get_object(id=id)
-            )
-            if application.status == MasterRequestStatusEnum.APPROVED:
+            master_request = await self.db.master_request.get_object(id=id)
+            if master_request.status == MasterRequestStatusEnum.APPROVED:
                 raise ApplicationApproved
+            application = master_utils.converts_application(master_request)
             await self.db.master_request.update(id, MasterRequestConfirmSchema())
             await self.db.user.update(application.id_user, UserUpdateMasterSchema())
-            return await self.db.master.create(application)
+            master =  await self.db.master.create(application)
+            await self.db.specialization_master.add_bulk(master.id,master_request.specializations)
         except NoFound:
             raise ApplicationNoFound
 
@@ -65,6 +65,10 @@ class MastersService(BaseService):
             master = await self.db.master.get_object(id_user=user_id)
             if data.bio:
                 await self.db.master.update_bio(master.id, data.bio)
+            if data.specialization:
+                print(master.id)
+                _master = await self.db.specialization_master.get_object(master_id = master.id)
+                return _master
 
         except NoFound:
             raise MasterNoFound

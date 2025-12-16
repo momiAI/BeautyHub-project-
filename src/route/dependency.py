@@ -44,6 +44,7 @@ async def get_db():
 
 
 DbDep = Annotated[DbManager, Depends(get_db)]
-UserDep = Annotated[UserDepSchema, Depends(user_dependency)]
+MeDep = Annotated[UserDepSchema, Depends(user_dependency())]
+UserDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.CLIENT))]
 AdminDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.ADMIN))]
 MasterDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.MASTER))]

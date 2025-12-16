@@ -21,8 +21,8 @@ class MasterDetailSchema(MasterSchema):
 
 class MasterUpdateSchema(BaseModel):
     bio: str | None = None
-    specializatin: list[CategoryEnum] | None = None
-    work_day: list[WeekDayEnum] | None = None
+    specialization: list[CategoryEnum] | None = None
+    work_days: list[WeekDayEnum] | None = None
 
 
 class MasterDBSchema(BaseModel):
@@ -32,7 +32,7 @@ class MasterDBSchema(BaseModel):
 
 class MasterCreateRequestSchema(BaseModel):
     bio_short: str
-    specializations: list[str]
+    specializations: list[CategoryEnum]
     portfolio: list[str]
 
 
@@ -48,3 +48,8 @@ class MasterRequestSchema(MasterConvertRequestSchema):
 
 class MasterRequestConfirmSchema(BaseModel):
     status: MasterRequestStatusEnum = MasterRequestStatusEnum.APPROVED
+
+
+class SpecializationMasterSchema(BaseModel):
+    master_id : int 
+    service_id : int

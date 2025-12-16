@@ -2,12 +2,13 @@ from sqlalchemy import update
 
 
 from src.repository.base import BaseRep
-from src.models.master import MasterModel, MasterRequestModel, WorkDayModel, DayOffModel
+from src.models.master import MasterModel, MasterRequestModel, WorkDayModel, DayOffModel, master_specialization_table
 from src.schemas.masters import (
     MasterSchema,
     MasterRequestSchema,
     WorkDaySchema,
     DayOffSchema,
+    SpecializationMasterSchema
 )
 
 
@@ -23,6 +24,14 @@ class MasterRepository(BaseRep):
             .returning(self.model)
         )
         return self.schema.model_validate(result.scalar_one(), from_attributes=True)
+
+
+class SpecializationMasterRepository(BaseRep):
+    model = master_specialization_table
+    schema = SpecializationMasterSchema
+
+    async def add_bulk(self, master_id : int, specializations : list):
+        dict_update = {"master_id" }
 
 
 class WorkDayRepository(BaseRep):
