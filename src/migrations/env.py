@@ -4,9 +4,9 @@ from sqlalchemy.engine import Connection
 from alembic import context
 
 
-from src.database import Base  
-from src.config import settings  
-from src.models import *
+from src.database import Base
+from src.config import settings
+from src.models import *  # noqa: F403
 
 from sqlalchemy.ext.asyncio import create_async_engine
 
@@ -46,7 +46,7 @@ async def run_migrations_online():
 
 def do_run_migrations(connection: Connection):
     context.configure(
-        connection=connection, 
+        connection=connection,
         target_metadata=target_metadata,
         compare_type=True,
     )
@@ -59,4 +59,5 @@ if context.is_offline_mode():
     run_migrations_offline()
 else:
     import asyncio
+
     asyncio.run(run_migrations_online())

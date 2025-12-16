@@ -1,21 +1,22 @@
 from enum import Enum
 
-class CategoryEnum(str,Enum):
-    FACE = 'face'
-    HAIR = 'hair' 
-    NAILS = 'nails' 
-    LASH = 'lash' 
-    BROWS = 'brows'
-    DEPILATION = 'depilation'
+
+class CategoryEnum(str, Enum):
+    FACE = "face"
+    HAIR = "hair"
+    NAILS = "nails"
+    LASH = "lash"
+    BROWS = "brows"
+    DEPILATION = "depilation"
 
 
-class UserRoleEnum(str,Enum):
-    ADMIN = 'admin' 
-    MASTER = 'master' 
-    CLIENT = 'client'
+class UserRoleEnum(str, Enum):
+    ADMIN = "admin"
+    MASTER = "master"
+    CLIENT = "client"
 
 
-class ReceptionStatusEnum(str,Enum):
+class ReceptionStatusEnum(str, Enum):
     PENDING = "pending"
     CONFIRMED = "confirmed"
     IN_PROGRESS = "in_progress"
@@ -28,7 +29,7 @@ class ReceptionStatusEnum(str,Enum):
     REFUNDED = "refunded"
 
 
-class WeekDayEnum(str,Enum):
+class WeekDayEnum(str, Enum):
     monday = "monday"
     tuesday = "tuesday"
     wednesday = "wednesday"
@@ -39,7 +40,7 @@ class WeekDayEnum(str,Enum):
 
 
 class MasterRequestStatusEnum(str, Enum):
-    PENDING = "pending"       
-    APPROVED = "approved"    
-    REJECTED = "rejected"     
-    IN_PROGRESS = "in_progress"  
+    PENDING = "pending"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    IN_PROGRESS = "in_progress"

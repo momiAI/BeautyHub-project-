@@ -1,57 +1,50 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from src.models.enum import MasterRequestStatusEnum,CategoryEnum
+from src.models.enum import MasterRequestStatusEnum, CategoryEnum
 from src.schemas.service import ServiceSchemas
 from src.schemas.dayoff import DayOffSchema
-from src.schemas.workday import WorkDaySchema,WeekDayEnum
+from src.schemas.workday import WorkDaySchema, WeekDayEnum
 
 
 class MasterSchema(BaseModel):
-    id : int 
-    id_user : int
-    bio : str
+    id: int
+    id_user: int
+    bio: str
 
 
 class MasterDetailSchema(MasterSchema):
-    specialization : list[ServiceSchemas] 
-    work_days : list[WorkDaySchema] 
-    day_offs : list[DayOffSchema] 
+    specialization: list[ServiceSchemas]
+    work_days: list[WorkDaySchema]
+    day_offs: list[DayOffSchema]
 
 
-class MasterUpdateSchema(BaseModel): 
-    bio : str | None = None
-    specializatin : list[CategoryEnum] | None = None
-    work_day : list[WeekDayEnum] | None = None
+class MasterUpdateSchema(BaseModel):
+    bio: str | None = None
+    specializatin: list[CategoryEnum] | None = None
+    work_day: list[WeekDayEnum] | None = None
 
 
 class MasterDBSchema(BaseModel):
-    id_user : int
-    bio : str
+    id_user: int
+    bio: str
+
 
 class MasterCreateRequestSchema(BaseModel):
-    bio_short : str
-    specializations : list[str]
-    portfolio : list[str]
+    bio_short: str
+    specializations: list[str]
+    portfolio: list[str]
+
 
 class MasterConvertRequestSchema(MasterCreateRequestSchema):
-    id_user : int 
-    status : MasterRequestStatusEnum
-    created_at : datetime 
+    id_user: int
+    status: MasterRequestStatusEnum
+    created_at: datetime
+
 
 class MasterRequestSchema(MasterConvertRequestSchema):
-    id : int 
+    id: int
+
 
 class MasterRequestConfirmSchema(BaseModel):
-    status : MasterRequestStatusEnum = MasterRequestStatusEnum.APPROVED
-
-
-
-
-
-
-
-
-
-
-
+    status: MasterRequestStatusEnum = MasterRequestStatusEnum.APPROVED

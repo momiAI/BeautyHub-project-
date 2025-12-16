@@ -1,6 +1,12 @@
 from src.repository.users import UsersRepository
-from src.repository.master import MasterRepository,MasterRequestRepository,WorkDayRepository,DayOffRepository
+from src.repository.master import (
+    MasterRepository,
+    MasterRequestRepository,
+    WorkDayRepository,
+    DayOffRepository,
+)
 from src.repository.service import ServiceRepository
+
 
 class DbManager:
     def __init__(self, session_factory):

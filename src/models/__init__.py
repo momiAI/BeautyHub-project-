@@ -4,10 +4,4 @@ from src.models.review import ReviewModel
 from src.models.service import ServiceModel
 from src.models.users import UsersModel
 
-__all__ = [
-    "MasterModel",
-    "ReceptionModel",
-    "ReviewModel",
-    "ServiceModel",
-    "UsersModel"
-]
+__all__ = ["MasterModel", "ReceptionModel", "ReviewModel", "ServiceModel", "UsersModel"]
