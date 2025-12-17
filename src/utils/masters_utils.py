@@ -47,5 +47,7 @@ class MastersUtils:
         else:
             return application
 
+    def all_ids_exist(self,ids_request: list[int], ids_base: list[int]) -> bool:
+        return set(ids_request).issubset(ids_base)
 
 master_utils = MastersUtils()

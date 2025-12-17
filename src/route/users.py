@@ -16,8 +16,13 @@ router = APIRouter(prefix="/users", tags=["Пользователи"])
 
 @router.get("/me", summary="Получение пользователя")
 async def user_me(db: DbDep, user: MeDep):
-    result = await UsersService(db).get_user_me(user.user_id)
-    return {"data": result}
+    try:
+        result = await UsersService(db).get_user_me(user.user_id)
+        return {"data": result}
+    except UserNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
+
+        
 
 
 @router.post("/create", summary="Создание пользователя")
@@ -55,6 +60,10 @@ async def user_login(
             "1": {
                 "summary": "Vlad",
                 "value": {"phone": "+79394455771", "password": "abcd1234"},
+            },
+            "2": {
+                "summary": "Admin",
+                "value": {"phone": "+79493322661", "password": "abcde1234"},
             }
         }
     ),

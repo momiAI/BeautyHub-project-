@@ -11,7 +11,8 @@ from src.utils.exceptions import (
     RoleNotAllowedError,
     ApplicationNoFound,
     ApplicationApproved,
-    MasterNoFound
+    MasterNoFound,
+    IdSpecializationNoFound
 )
 
 router = APIRouter(prefix="/master", tags=["Мастера"])
@@ -34,12 +35,9 @@ async def application(
                 "value": {
                     "bio_short": "Профессионал своего дела",
                     "specializations": [
-                        "face",
-                        "hair",
-                        "nails",
-                        "lash",
-                        "brows",
-                        "depilation",
+                        104,
+                        105,
+                        106
                     ],
                     "portfolio": ["Возможная ссылка", "Другая ссылка"],
                 },
@@ -65,6 +63,8 @@ async def application(
         raise HTTPException(
             status_code=403, detail="Только пользователь может создать заявку."
         )
+    except IdSpecializationNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
 
 
 @router.post(
@@ -73,7 +73,7 @@ async def application(
 async def confirm_application(id: int, db: DbDep, admin: AdminDep):
     try:
         result = await MastersService(db).confirm(id)
-        #await db.commit()
+        await db.commit()
         return {"data": result}
     except ApplicationNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
@@ -92,12 +92,8 @@ async def update_master(
                 "value": {
                     "bio": "Cвоего дела",
                     "specialization": [
-                        "face",
-                        "hair",
-                        "nails",
-                        "lash",
-                        "brows",
-                        "depilation",
+                        105,
+                        106
                     ],
                     "work_days": [
                         "monday",

@@ -3,13 +3,18 @@ from sqlalchemy import update
 
 from src.repository.base import BaseRep
 from src.models.master import MasterModel, MasterRequestModel, WorkDayModel, DayOffModel, master_specialization_table
+from src.models.master_specialization import MasterSpecializationModel
+from src.utils.masters_utils import master_utils
+from src.utils.exceptions import NoFound
 from src.schemas.masters import (
     MasterSchema,
     MasterRequestSchema,
     WorkDaySchema,
     DayOffSchema,
-    SpecializationMasterSchema
+    SpecializationMasterRelationSchema,
+    MasterSpecializationSchema
 )
+
 
 
 class MasterRepository(BaseRep):
@@ -26,12 +31,20 @@ class MasterRepository(BaseRep):
         return self.schema.model_validate(result.scalar_one(), from_attributes=True)
 
 
-class SpecializationMasterRepository(BaseRep):
+class SpecializationMasterRelationRepository(BaseRep):
     model = master_specialization_table
-    schema = SpecializationMasterSchema
+    schema = SpecializationMasterRelationSchema
 
-    async def add_bulk(self, master_id : int, specializations : list):
-        dict_update = {"master_id" }
+
+class MasterSpecializationRepository(BaseRep):
+    model = MasterSpecializationModel
+    schema = MasterSpecializationSchema
+
+    async def check_ids(self, ids_request : list[int]):
+        ids_specialization = [model.id for model in await self.get_all()]
+        if master_utils.all_ids_exist(ids_request = ids_request, ids_base = ids_specialization) is False:
+            raise NoFound
+
 
 
 class WorkDayRepository(BaseRep):

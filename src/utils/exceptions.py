@@ -24,6 +24,8 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
+class IdSpecializationNoFound(NoFound):
+    detail = "Специализация не найдена."
 
 class MasterNoFound(NoFound):
     detail = "Мастер не найден."

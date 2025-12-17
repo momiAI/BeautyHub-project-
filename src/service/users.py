@@ -14,7 +14,10 @@ from src.utils.exceptions import (
 
 class UsersService(BaseService):
     async def get_user_me(self, id: int):
-        return await self.db.user.get_object(id=id)
+        try:
+            return await self.db.user.get_object(id=id)
+        except NoFound:
+            raise UserNoFound
 
     async def login_user(self, data: UserLogin):
         try:

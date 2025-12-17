@@ -4,6 +4,7 @@ from src.schemas.masters import (
     MasterCreateRequestSchema,
     MasterRequestConfirmSchema,
     MasterUpdateSchema,
+    SpecializationMasterRelationSchema
 )
 from src.utils.masters_utils import master_utils
 from src.utils.exceptions import (
@@ -16,6 +17,7 @@ from src.utils.exceptions import (
     ApplicationNoFound,
     MasterNoFound,
     ApplicationApproved,
+    IdSpecializationNoFound
 )
 from src.models.enum import UserRoleEnum, MasterRequestStatusEnum
 
@@ -25,8 +27,15 @@ class MastersService(BaseService):
         self, id_user: int, data: MasterCreateRequestSchema, role: str
     ):
         data_update = master_utils.converts_request_data(id_user, data)
+        
         if role != UserRoleEnum.CLIENT:
             raise RoleNotAllowedError
+        
+        try:
+            await self.db.master_specialization.check_ids(data.specializations)
+        except NoFound:
+            raise IdSpecializationNoFound
+
         try:
             application = await self.db.master_request.get_object(id_user=id_user)
             if application:
@@ -56,7 +65,12 @@ class MastersService(BaseService):
             await self.db.master_request.update(id, MasterRequestConfirmSchema())
             await self.db.user.update(application.id_user, UserUpdateMasterSchema())
             master =  await self.db.master.create(application)
-            await self.db.specialization_master.add_bulk(master.id,master_request.specializations)
+            await self.db.master_specialization_relation.create_bulk(
+                [
+                    SpecializationMasterRelationSchema(master_id= master.id,masterspecialization_id=i)
+                    for i in master_request.specializations
+                ]
+            )
         except NoFound:
             raise ApplicationNoFound
 
@@ -66,9 +80,8 @@ class MastersService(BaseService):
             if data.bio:
                 await self.db.master.update_bio(master.id, data.bio)
             if data.specialization:
-                print(master.id)
-                _master = await self.db.specialization_master.get_object(master_id = master.id)
-                return _master
+                ids_specilizations = self.db.master_specialization_relation.patch_relation()
+            
 
         except NoFound:
             raise MasterNoFound

@@ -28,7 +28,7 @@ class MasterModel(Base):
     )
     bio: Mapped[str] = mapped_column(Text())
 
-    specialization: Mapped[list["ServiceModel"]] = relationship( # noqa: F821 # type: ignore
+    specialization: Mapped[list["MasterSpecializationModel"]] = relationship( # noqa: F821 # type: ignore
         secondary="specialization_master", back_populates="master"
     )  
     work_days: Mapped[list["WorkDayModel"]] = relationship(
@@ -38,14 +38,13 @@ class MasterModel(Base):
         back_populates="master", cascade="all, delete-orphan"
     )
 
+    services : Mapped[list["MasterServiceModel"]] = relationship(back_populates="master")# noqa: F821 # type: ignore
 
 master_specialization_table = Table(
     "specialization_master",
     Base.metadata,
     Column("master_id", ForeignKey("master.id", ondelete="CASCADE"), primary_key=True),
-    Column(
-        "service_id", ForeignKey("service.id", ondelete="CASCADE"), primary_key=True
-    ),
+    Column("masterspecialization_id", ForeignKey("masterspecialization.id", ondelete="CASCADE"), primary_key=True),
 )
 
 
@@ -56,8 +55,8 @@ class WorkDayModel(Base):
     id_master: Mapped[int] = mapped_column(
         Integer, ForeignKey("master.id", ondelete="CASCADE")
     )
-    day_of_week: Mapped[WeekDayEnum] = mapped_column(
-        Enum(WeekDayEnum, native_enum=False)
+    day_of_week: Mapped[list[WeekDayEnum]] = mapped_column(
+        ARRAY(Enum(WeekDayEnum, native_enum=False))
     )
     start_time: Mapped[time] = mapped_column(Time())
     end_time: Mapped[time] = mapped_column(Time())
@@ -90,7 +89,7 @@ class MasterRequestModel(Base):
         Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True
     )
     bio_short: Mapped[str] = mapped_column(String(50))
-    specializations: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=False)
+    specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     portfolio: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=True)
     status: Mapped[MasterRequestStatusEnum] = mapped_column(
         Enum(MasterRequestStatusEnum, native_enum=False)

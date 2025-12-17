@@ -13,6 +13,15 @@ class BaseRep:
     def __init__(self, session):
         self.session = session
 
+    async def get_all(self):
+        query = await self.session.execute(select(self.model))
+        return [self.schema.model_validate(model,from_attributes=True) for model in query.scalars().all()]
+
+    async def patch_relation(self, id_who : int, ids_request : list[int]):
+        ids_base = [ids.id for ids in await self.get_all()]
+        # Тут хочу разделить массив на два, id которые входят в него(значит удаляем), id которые не входят в него(добавляем)
+
+
     async def get_object(self, **kwargs):
         try:
             result = await self.session.execute(select(self.model).filter_by(**kwargs))
@@ -38,6 +47,11 @@ class BaseRep:
         except IntegrityError as exc:
             if getattr(exc.orig, "sqlstate", None) == "23505":
                 raise UniqueError
+    
+    async def create_bulk(self,data : list[BaseModel]):
+        stmt = insert(self.model).values([model.model_dump() for model in data])
+        result = await self.session.execute(stmt)
+        return result
 
     async def delete_by_id(self, id: int):
         try:
