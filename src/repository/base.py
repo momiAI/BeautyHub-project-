@@ -6,7 +6,7 @@ from src.database import Base
 from src.utils.exceptions import UniqueError, NoFound
 
 
-class BaseRep:
+class BaseOrmRep:
     model: Base = None
     schema: BaseModel = None
 
@@ -14,13 +14,9 @@ class BaseRep:
         self.session = session
 
     async def get_all(self):
-        query = await self.session.execute(select(self.model))
-        return [self.schema.model_validate(model,from_attributes=True) for model in query.scalars().all()]
-
-    async def patch_relation(self, id_who : int, ids_request : list[int]):
-        ids_base = [ids.id for ids in await self.get_all()]
-        # Тут хочу разделить массив на два, id которые входят в него(значит удаляем), id которые не входят в него(добавляем)
-
+        result = await self.session.execute(select(self.model))
+        return [self.schema.model_validate(model,from_attributes=True) for model in result.scalars().all()]
+    
 
     async def get_object(self, **kwargs):
         try:
@@ -49,9 +45,9 @@ class BaseRep:
                 raise UniqueError
     
     async def create_bulk(self,data : list[BaseModel]):
-        stmt = insert(self.model).values([model.model_dump() for model in data])
-        result = await self.session.execute(stmt)
-        return result
+            stmt = insert(self.model).values([model.model_dump() for model in data]).returning(self.model)
+            result = await self.session.execute(stmt)
+            return [self.schema.model_validate(model,from_attributes=True) for model in result.scalars().all()]
 
     async def delete_by_id(self, id: int):
         try:

@@ -6,6 +6,7 @@ from src.schemas.masters import (
     MasterUpdateSchema,
     SpecializationMasterRelationSchema
 )
+from src.schemas.workday import WorkDayDbSchema,WorkDayRequstSchema
 from src.utils.masters_utils import master_utils
 from src.utils.exceptions import (
     MasterRequestAlreadyInProgressError,
@@ -71,17 +72,34 @@ class MastersService(BaseService):
                     for i in master_request.specializations
                 ]
             )
+            return master
         except NoFound:
             raise ApplicationNoFound
 
-    async def patch(self, user_id: int, data: MasterUpdateSchema):
+    async def patch(self, user_id: int, data: MasterUpdateSchema, workdays : WorkDayRequstSchema):
         try:
-            master = await self.db.master.get_object(id_user=user_id)
+            master = await self.db.master.get_object(id_user=user_id) 
+            result = {}
             if data.bio:
-                await self.db.master.update_bio(master.id, data.bio)
+                bio = await self.db.master.update_bio(master.id, data.bio)
+                result["bio"] = bio
             if data.specialization:
-                ids_specilizations = self.db.master_specialization_relation.patch_relation()
-            
+                ids_base = [ids.masterspecialization_id for ids in await self.db.master_specialization_relation.get_all_by_name_column_id(master.id,"master_id")] 
+                add_list_ids = list(set(data.specialization) - set(ids_base))
+                delete_list_ids = list(set(ids_base) - set(data.specialization))
+                add_list_schemas = master_utils.converts_list_from_id_schema(master_id=master.id,ids_specialization=add_list_ids)
+                if add_list_ids:
+                    result_add = await self.db.master_specialization_relation.create_bulk(add_list_schemas)
+                    result["ids_add"] = result_add
+                if delete_list_ids:
+                    result_delete = await self.db.master_specialization_relation.delete_bulk_by_name_column_and_list_ids(master.id,delete_list_ids)
+                    result["ids_delete"] = result_delete
+            if data.work_days:
+                check_in_db = await self.db.workday.get_object(id_master = master.id)
+                
+                data_workday = WorkDayDbSchema(id_master=master.id, **workdays.model_dump())
 
+                
+            return result
         except NoFound:
             raise MasterNoFound

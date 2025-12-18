@@ -11,6 +11,7 @@ from src.schemas.masters import (
     MasterCreateRequestSchema,
     MasterRequestSchema,
     MasterDBSchema,
+    SpecializationMasterRelationSchema
 )
 from src.models.enum import MasterRequestStatusEnum
 
@@ -23,6 +24,13 @@ class MastersUtils:
             created_at=datetime.now().replace(second=0, microsecond=0),
             **data.model_dump(),
         )
+
+    def converts_list_from_id_schema(self, master_id : int, ids_specialization : list[int]):
+        return [
+            SpecializationMasterRelationSchema(master_id=master_id,masterspecialization_id=i)
+            for i in ids_specialization
+        ]
+
 
     def converts_application(self, data: MasterRequestSchema):
         return MasterDBSchema(id_user=data.id_user, bio=data.bio_short)

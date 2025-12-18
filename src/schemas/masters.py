@@ -22,7 +22,6 @@ class MasterDetailSchema(MasterSchema):
 class MasterUpdateSchema(BaseModel):
     bio: str | None = None
     specialization: list[int] | None = None
-    work_days: list[WeekDayEnum] | None = None
 
 
 class MasterDBSchema(BaseModel):

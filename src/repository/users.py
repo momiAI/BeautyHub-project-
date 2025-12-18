@@ -1,8 +1,8 @@
-from src.repository.base import BaseRep
+from src.repository.base import BaseOrmRep
 from src.models.users import UsersModel
 from src.schemas.users import User
 
 
-class UsersRepository(BaseRep):
+class UsersRepository(BaseOrmRep):
     model = UsersModel
     schema = User

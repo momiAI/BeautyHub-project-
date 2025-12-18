@@ -2,6 +2,7 @@ from fastapi import APIRouter, Body, HTTPException
 
 from src.route.dependency import UserDep, DbDep, AdminDep, MasterDep
 from src.schemas.masters import MasterCreateRequestSchema, MasterUpdateSchema
+from src.schemas.workday import WorkDayRequstSchema
 from src.service.masters import MastersService
 from src.utils.exceptions import (
     CancleRequestAndColldownError,
@@ -94,20 +95,12 @@ async def update_master(
                     "specialization": [
                         105,
                         106
-                    ],
-                    "work_days": [
-                        "monday",
-                        "tuesday",
-                        "wednesday",
-                        "thursday",
-                        "friday",
-                        "saturday",
-                        "sunday",
-                    ],
+                    ]
                 },
             }
         }
     ),
+    #добавить workdays сюда
 ):
     try:
         result = await MastersService(db).patch(master.user_id, data)
