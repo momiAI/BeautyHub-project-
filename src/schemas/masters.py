@@ -1,7 +1,8 @@
 from pydantic import BaseModel
 from datetime import datetime
 
-from src.models.enum import MasterRequestStatusEnum, CategoryEnum
+from src.models.enum import MasterRequestStatusEnum
+from src.schemas.users import UserDepSchema
 from src.schemas.service import ServiceSchemas
 from src.schemas.dayoff import DayOffSchema
 from src.schemas.workday import WorkDaySchema,WorkDayRequstSchema
@@ -61,3 +62,6 @@ class MasterSpecializationCreateSchema(BaseModel):
 
 class MasterSpecializationSchema(MasterSpecializationCreateSchema):
     id : int
+
+class MasterDepSchema(UserDepSchema):
+    role_id : int 

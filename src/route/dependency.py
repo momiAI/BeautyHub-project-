@@ -3,6 +3,7 @@ from fastapi import Depends, Request, HTTPException
 
 
 from src.schemas.users import UserDepSchema
+from src.schemas.masters import MasterDepSchema
 from src.utils.exceptions import IncorectToken, TokenTimeIsOver
 from src.utils.users_utils import user_utils
 from src.utils.db_manager import DbManager
@@ -28,6 +29,10 @@ def user_dependency(role: UserRoleEnum | None = None):
                     raise HTTPException(
                         status_code=403,
                         detail="Недостаточно прав для выполнения запроса!",
+                    )
+                if user.role == UserRoleEnum.MASTER:
+                    return MasterDepSchema.model_validate(
+                        user_utils.decode_token(access_token=token)
                     )
             return user
         except IncorectToken:

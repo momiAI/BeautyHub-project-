@@ -89,5 +89,14 @@ class UserUtils:
             rating=[],
         )
 
+    def create_access_refresh_tokens(self,id_user : int ,role : UserRoleEnum, id_role : int | None = None):
+        payload = {"user_id": id_user, "role": role}
+        if role == UserRoleEnum.MASTER and id_role:
+            payload["role_id"] = id_role
+        
+        access_token = self.create_access_token(payload)
+        refresh_token = self.create_refresh_token(payload)
+
+        return access_token,refresh_token
 
 user_utils = UserUtils()

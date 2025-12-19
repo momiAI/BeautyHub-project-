@@ -1,3 +1,4 @@
+from src.models.enum import UserRoleEnum
 from src.service.base import BaseService
 from src.schemas.users import UserCreate, UserLogin
 from src.utils.users_utils import user_utils
@@ -26,13 +27,12 @@ class UsersService(BaseService):
             )
             if user_utils.verify_password(data.password, user.password_hash) is False:
                 raise IncorectData
-            access_token = user_utils.create_access_token(
-                {"user_id": user.id, "role": user.role}
-            )
-            refresh_token = user_utils.create_refresh_token(
-                {"user_id": user.id, "role": user.role}
-            )
-            return access_token, refresh_token
+            if user.role != UserRoleEnum.MASTER:
+                return user_utils.create_access_refresh_tokens(user.id,user.role)
+            else:
+                master = await self.db.master.get_object(id_user = user.id)
+                return user_utils.create_access_refresh_tokens(user.id,user.role, master.id)
+        
         except NoFound:
             raise UserNoFound
         except IncorectPhone:

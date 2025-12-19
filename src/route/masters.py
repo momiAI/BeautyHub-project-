@@ -22,7 +22,10 @@ router = APIRouter(prefix="/master", tags=["Мастера"])
 
 @router.get(path="/me",summary="Получение мастера")
 async def me(db : DbDep, master : MasterDep):
-    result = await MastersService(db).get_me()
+    try:
+        return await MastersService(db).get_me(master.role_id)
+    except MasterNoFound as exc:
+        raise HTTPException(status_code=404,detail=exc.detail)
 
 
 @router.post(path="/application", summary="Создание заявки на добавления мастера")
@@ -107,7 +110,8 @@ async def update_master(
     ),
 ):
     try:
-        result = await MastersService(db).patch(master.user_id, data)
+        result = await MastersService(db).patch(master.role_id, data)
+        await db.commit()
         return {"data" : result}
     except MasterNoFound as exc:
         return HTTPException(status_code=404, detail = exc.detail)
