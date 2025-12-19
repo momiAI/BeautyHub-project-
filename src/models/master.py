@@ -56,7 +56,9 @@ class WorkDayModel(Base):
         Integer, ForeignKey("master.id", ondelete="CASCADE")
     )
     day_of_week: Mapped[list[WeekDayEnum]] = mapped_column(
-        ARRAY(Enum(WeekDayEnum, native_enum=False))
+        ARRAY(Enum(WeekDayEnum, 
+        length = 15,
+        native_enum=False))
     )
     start_time: Mapped[time] = mapped_column(Time())
     end_time: Mapped[time] = mapped_column(Time())

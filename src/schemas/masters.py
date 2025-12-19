@@ -4,7 +4,7 @@ from datetime import datetime
 from src.models.enum import MasterRequestStatusEnum, CategoryEnum
 from src.schemas.service import ServiceSchemas
 from src.schemas.dayoff import DayOffSchema
-from src.schemas.workday import WorkDaySchema, WeekDayEnum
+from src.schemas.workday import WorkDaySchema,WorkDayRequstSchema
 
 
 class MasterSchema(BaseModel):
@@ -18,11 +18,14 @@ class MasterDetailSchema(MasterSchema):
     work_days: list[WorkDaySchema]
     day_offs: list[DayOffSchema]
 
+class MasterBioUpdateSchema(BaseModel):
+    bio : str
+
 
 class MasterUpdateSchema(BaseModel):
     bio: str | None = None
     specialization: list[int] | None = None
-
+    workdays : WorkDayRequstSchema
 
 class MasterDBSchema(BaseModel):
     id_user: int

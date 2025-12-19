@@ -22,16 +22,6 @@ class MasterRepository(BaseOrmRep):
     model = MasterModel
     schema = MasterSchema
 
-    async def update_bio(self, id: int, value):
-        result = await self.session.execute(
-            update(self.model)
-            .where(self.model.id == id)
-            .values(bio=value)
-            .returning(self.model)
-        )
-        return self.schema.model_validate(result.scalar_one(), from_attributes=True)
-
-
 class SpecializationMasterRelationRepository(BaseCoreRep):
     table = master_specialization_table
     schema = SpecializationMasterRelationSchema

@@ -95,16 +95,22 @@ async def update_master(
                     "specialization": [
                         105,
                         106
-                    ]
+                    ],
+                    "workdays" : {
+                        "day_of_week": ["monday","wednesday","friday"],
+                        "start_time": "09:00",
+                        "end_time": "18:00"
+                    },
                 },
             }
         }
     ),
-    #добавить workdays сюда
 ):
     try:
         result = await MastersService(db).patch(master.user_id, data)
         return {"data" : result}
     except MasterNoFound as exc:
         return HTTPException(status_code=404, detail = exc.detail)
+    except IdSpecializationNoFound as exc:
+        return HTTPException(status_code=404,detail=exc.detail)
     

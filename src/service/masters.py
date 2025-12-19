@@ -4,7 +4,8 @@ from src.schemas.masters import (
     MasterCreateRequestSchema,
     MasterRequestConfirmSchema,
     MasterUpdateSchema,
-    SpecializationMasterRelationSchema
+    SpecializationMasterRelationSchema,
+    MasterBioUpdateSchema
 )
 from src.schemas.workday import WorkDayDbSchema,WorkDayRequstSchema
 from src.utils.masters_utils import master_utils
@@ -76,30 +77,47 @@ class MastersService(BaseService):
         except NoFound:
             raise ApplicationNoFound
 
-    async def patch(self, user_id: int, data: MasterUpdateSchema, workdays : WorkDayRequstSchema):
+    async def patch(self, user_id: int, data: MasterUpdateSchema):
+        
         try:
             master = await self.db.master.get_object(id_user=user_id) 
-            result = {}
-            if data.bio:
-                bio = await self.db.master.update_bio(master.id, data.bio)
-                result["bio"] = bio
-            if data.specialization:
-                ids_base = [ids.masterspecialization_id for ids in await self.db.master_specialization_relation.get_all_by_name_column_id(master.id,"master_id")] 
-                add_list_ids = list(set(data.specialization) - set(ids_base))
-                delete_list_ids = list(set(ids_base) - set(data.specialization))
-                add_list_schemas = master_utils.converts_list_from_id_schema(master_id=master.id,ids_specialization=add_list_ids)
-                if add_list_ids:
-                    result_add = await self.db.master_specialization_relation.create_bulk(add_list_schemas)
-                    result["ids_add"] = result_add
-                if delete_list_ids:
-                    result_delete = await self.db.master_specialization_relation.delete_bulk_by_name_column_and_list_ids(master.id,delete_list_ids)
-                    result["ids_delete"] = result_delete
-            if data.work_days:
-                check_in_db = await self.db.workday.get_object(id_master = master.id)
-                
-                data_workday = WorkDayDbSchema(id_master=master.id, **workdays.model_dump())
-
-                
-            return result
         except NoFound:
             raise MasterNoFound
+        result = {}
+
+
+        if data.bio:
+            result["bio"] = await self.db.master.update(master.id, MasterBioUpdateSchema(bio = data.bio))
+
+
+        if data.specialization:
+            ids_base = [ids.masterspecialization_id for ids in await self.db.master_specialization_relation.get_all_by_name_column_id(master.id,"master_id")]
+            if set(data.specialization).issubset(set(ids_base)) is False:
+                raise IdSpecializationNoFound
+            add_list_ids = list(set(data.specialization) - set(ids_base))
+            delete_list_ids = list(set(ids_base) - set(data.specialization))
+            add_list_schemas = master_utils.converts_list_from_id_schema(master_id=master.id,ids_specialization=add_list_ids)
+                
+
+        if delete_list_ids:
+            result["ids_delete"] = await self.db.master_specialization_relation.delete_bulk_by_name_column_and_list_ids(master.id,delete_list_ids)
+
+
+        if add_list_ids:
+            result["ids_add"] = await self.db.master_specialization_relation.create_bulk(add_list_schemas)
+
+
+        if data.workdays:
+            try:
+                check_in_db = await self.db.workday.get_object(id_master = master.id)
+                result["workday"] = await self.db.workday.update(check_in_db.id,set(data.workdays))
+            except NoFound:
+                data_workday_update = WorkDayRequstSchema(
+                    day_of_week=set(data.workdays.day_of_week),
+                    start_time=data.workdays.start_time,
+                    end_time=data.workdays.end_time
+                    )
+                result["workday"] = await self.db.workday.create(WorkDayDbSchema(id_master=master.id, **data_workday_update.model_dump())) 
+                
+        return result
+
