@@ -1,9 +1,9 @@
 from pydantic import BaseModel
 from sqlalchemy import insert, delete, select, update
-from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.exc import IntegrityError, NoResultFound,MultipleResultsFound
 
 from src.database import Base
-from src.utils.exceptions import UniqueError, NoFound
+from src.utils.exceptions import UniqueError, NoFound, MultipleResult
 
 
 class BaseOrmRep:
@@ -18,12 +18,20 @@ class BaseOrmRep:
         return [self.schema.model_validate(model,from_attributes=True) for model in result.scalars().all()]
     
 
+    async def get_all_by_filters(self, **kwargs):
+        query = select(self.model).filter_by(**kwargs)
+        result = await self.session.execute(query)
+        return [self.schema.model_validate(model,from_attributes=True) for model in result.scalars().all()]
+    
+
     async def get_object(self, **kwargs):
         try:
             result = await self.session.execute(select(self.model).filter_by(**kwargs))
             return self.schema.model_validate(result.scalar_one(), from_attributes=True)
         except NoResultFound:
             raise NoFound
+        except MultipleResultsFound:
+            raise MultipleResult
     
     async def update(self, id: int, values: BaseModel):
         result = await self.session.execute(

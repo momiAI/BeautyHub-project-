@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Body, HTTPException,Depends
+from fastapi import APIRouter,Body, HTTPException
 
 from src.route.dependency import AdminDep,DbDep
 from src.schemas.masters import MasterSpecializationCreateSchema
@@ -7,23 +7,26 @@ from src.service.masters import MastersService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, UserNoFound
+from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
 
 
-@router.post("/service-add", summary="Добавление услуг")
-async def add_service(db : DbDep,admin : AdminDep, data : ServiceCreateSchemas = Body(openapi_examples= {"1" : {
+@router.post("/service-add/{specialization_id}", summary="Добавление услуг")
+async def add_service(specialization_id : int ,db : DbDep,admin : AdminDep, data : ServiceCreateSchemas = Body(openapi_examples= {"1" : {
     "summary" : "Наращивание ресниц",
     "value" : {
         "name": "Наращивание ресниц",
         "category": "lash"
     }
  }})):
-    result = await ServService(db).create(data)
-    await db.commit()
-    return {"data" : result}
+    try:
+        result = await ServService(db).create(specialization_id,data)
+        await db.commit()
+        return {"data" : result}
+    except IdSpecializationNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
 
 
 @router.post(
@@ -52,11 +55,20 @@ async def add_specialization(db : DbDep,admin : AdminDep, data : MasterSpecializ
     await db.commit()
     return {"data" : result}
 
-@router.delete("/delete/user/{id}", summary="Удалить пользователя")
+@router.delete("/user/delete/{id}", summary="Удалить пользователя")
 async def user_delete(db: DbDep, id: int, admin : AdminDep):
     try:
         result = await UsersService(db).delete_user(id)
         await db.commit()
         return {"data": result}
     except UserNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
+    
+@router.delete("/service/delete/{id}",summary="Удалить услугу")
+async def service_delete(db : DbDep, id : int, admin : AdminDep):
+    try:
+        result = await ServService(db).delete_service(id)
+        await db.commit()
+        return {"data" : result}
+    except ServiceNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)

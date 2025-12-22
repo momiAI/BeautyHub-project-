@@ -11,6 +11,11 @@ class BaseCoreRep:
     def __init__(self, session):
         self.session = session
 
+    async def create(self,data : BaseModel):
+          stmt = insert(self.table).values(data.model_dump()).returning(self.table)
+          result = await self.session.execute(stmt)
+          return [self.schema.model_validate(model,from_attributes=True) for model in result.mappings().all()]
+
     async def create_bulk(self,data : list[BaseModel]):
             stmt = insert(self.table).values([model.model_dump() for model in data]).returning(self.table)
             result = await self.session.execute(stmt)

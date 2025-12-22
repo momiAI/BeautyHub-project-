@@ -14,6 +14,8 @@ class IncorectDate(IncorectData):
 class IncorectPhone(IncorectData):
     detail = "Неверный формат телефона"
 
+class MultipleResult(CustomException):
+    detail = "Ожидалось получить одну строчку, но было найдено множество."
 
 class UniqueError(CustomException):
     detail = "Объект уже существует"
@@ -36,14 +38,14 @@ class MasterNoFound(NoFound):
 class ApplicationNoFound(NoFound):
     detail = "Заявка не найдена."
 
-
-class ApplicationApproved(CustomException):
-    detail = "Заявка подтверждена"
-
-
 class UserNoFound(NoFound):
     detail = "Пользователь не найден."
 
+class ServiceNoFound(NoFound):
+    detail = "Услуга не найдена."
+
+class ApplicationApproved(CustomException):
+    detail = "Заявка подтверждена"
 
 class IncorectToken(IncorectData):
     detail = "Неверный токен"
