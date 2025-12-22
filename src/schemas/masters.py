@@ -3,8 +3,7 @@ from datetime import datetime
 
 from src.models.enum import MasterRequestStatusEnum
 from src.schemas.users import UserDepSchema
-from src.schemas.service import ServiceSchemas
-from src.schemas.dayoff import DayOffSchema
+from src.schemas.dayoff import DayOffCreateSchema
 from src.schemas.workday import WorkDaySchema,WorkDayRequstSchema
 
 
@@ -20,7 +19,7 @@ class MasterSpecializationCreateSchema(BaseModel):
 class MasterDetailSchema(MasterSchema):
     specialization: list[MasterSpecializationCreateSchema] | None = None
     work_days: list[WorkDaySchema] | None = None
-    day_offs: list[DayOffSchema] | None =None
+    day_offs: list[DayOffCreateSchema] | None =None
 
 class MasterBioUpdateSchema(BaseModel):
     bio : str
@@ -30,6 +29,7 @@ class MasterUpdateSchema(BaseModel):
     bio: str | None = None
     specialization: list[int] | None = None
     workdays : WorkDayRequstSchema
+    day_off : DayOffCreateSchema
 
 class MasterDBSchema(BaseModel):
     id_user: int
@@ -63,6 +63,6 @@ class SpecializationMasterRelationSchema(BaseModel):
 
 class MasterDepSchema(UserDepSchema):
     role_id : int 
-    
+
 class MasterSpecializationSchema(MasterSpecializationCreateSchema):
     id : int

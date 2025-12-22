@@ -2,7 +2,7 @@ from fastapi import APIRouter, Body, HTTPException
 
 from src.route.dependency import UserDep, DbDep, MasterDep
 from src.schemas.masters import MasterCreateRequestSchema, MasterUpdateSchema
-from src.schemas.workday import WorkDayRequstSchema
+from src.schemas.dayoff import DayOffCreateSchema
 from src.service.masters import MastersService
 from src.utils.exceptions import (
     CancleRequestAndColldownError,
@@ -10,10 +10,9 @@ from src.utils.exceptions import (
     MasterRequestCooldownError,
     MasterRequestUniqueError,
     RoleNotAllowedError,
-    ApplicationNoFound,
-    ApplicationApproved,
     MasterNoFound,
-    IdSpecializationNoFound
+    IdSpecializationNoFound,
+    IncorectDate
 )
 
 router = APIRouter(prefix="/master", tags=["Мастера"])
@@ -71,6 +70,18 @@ async def application(
         raise HTTPException(status_code=404, detail=exc.detail)
 
 
+@router.post(path="/day-off/add/",summary="Добавить выходной/отгул")
+async def day_off_add(db : DbDep, master : MasterDep, data : DayOffCreateSchema = Body(openapi_examples={"1" : {"summary" : "Свадьба","value" : {
+    "day": "2025-12-23",
+    "reason": "У сестры свадьба"
+}}})):
+    try:
+        result = await MastersService(db).add_day_off(master.role_id,data)
+        await db.commit()
+        return {"data" : result}
+    except IncorectDate:
+        raise HTTPException(status_code=422, detail="Прошлая дата, укажите настоящую или будущую дату.")
+
 @router.patch(path="/update", summary="Обновление данных")
 async def update_master(
     db: DbDep,
@@ -103,4 +114,4 @@ async def update_master(
         return HTTPException(status_code=404, detail = exc.detail)
     except IdSpecializationNoFound as exc:
         return HTTPException(status_code=404,detail=exc.detail)
-    
+

@@ -7,6 +7,7 @@ from src.schemas.masters import (
     SpecializationMasterRelationSchema,
     MasterBioUpdateSchema
 )
+from src.schemas.dayoff import DayOffCreateSchema
 from src.schemas.workday import WorkDayDbSchema,WorkDayRequstSchema
 from src.utils.masters_utils import master_utils
 from src.utils.exceptions import (
@@ -17,9 +18,10 @@ from src.utils.exceptions import (
     NoFound,
     RoleNotAllowedError,
     ApplicationNoFound,
-    MasterNoFound,
     ApplicationApproved,
-    IdSpecializationNoFound
+    IdSpecializationNoFound,
+    IncorectDate,
+    IncorectData
 )
 from src.models.enum import UserRoleEnum, MasterRequestStatusEnum
 
@@ -27,11 +29,15 @@ from src.models.enum import UserRoleEnum, MasterRequestStatusEnum
 class MastersService(BaseService):
 
     async def get_me(self,id : int):
-        try:
-            return await self.db.master.get_master_by_id(id = id)
-        except NoFound:
-            raise MasterNoFound
+        return await self.db.master.get_master_by_id(id = id)
 
+    async def add_day_off(self, id : int, data : DayOffCreateSchema ):
+        try:
+            data_update = master_utils.converts_and_check_date_day_off(id,data)
+        except IncorectData:
+            raise IncorectDate
+        
+        return await self.db.dayoff.create(data_update)
 
 
     async def request_application(

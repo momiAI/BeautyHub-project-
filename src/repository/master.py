@@ -12,11 +12,11 @@ from src.schemas.masters import (
     MasterSchema,
     MasterRequestSchema,
     WorkDaySchema,
-    DayOffSchema,
     SpecializationMasterRelationSchema,
     MasterSpecializationSchema,
     MasterDetailSchema
 )
+from src.schemas.dayoff import DayOffSchema
 
 
 

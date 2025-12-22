@@ -2,8 +2,12 @@ from pydantic import BaseModel
 from datetime import date
 
 
-class DayOffSchema(BaseModel):
-    id: int
-    id_master: int
+class DayOffCreateSchema(BaseModel):
     day: date
-    reason: str | None
+    reason: str | None = None
+
+class DayOffDBSchema(DayOffCreateSchema):
+    id_master: int
+
+class DayOffSchema(DayOffDBSchema):
+    id: int

@@ -1,18 +1,20 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone,date
 
 from src.utils.exceptions import (
     MasterRequestCooldownError,
     MasterRequestUniqueError,
     CancleRequestAndColldownError,
     MasterRequestAlreadyInProgressError,
+    IncorectData
 )
 from src.schemas.masters import (
     MasterConvertRequestSchema,
     MasterCreateRequestSchema,
     MasterRequestSchema,
     MasterDBSchema,
-    SpecializationMasterRelationSchema
+    SpecializationMasterRelationSchema,
 )
+from src.schemas.dayoff import DayOffCreateSchema,DayOffDBSchema
 from src.models.enum import MasterRequestStatusEnum
 
 
@@ -30,6 +32,11 @@ class MastersUtils:
             SpecializationMasterRelationSchema(master_id=master_id,masterspecialization_id=i)
             for i in ids_specialization
         ]
+
+    def converts_and_check_date_day_off(self, master_id : int ,data : DayOffCreateSchema):
+        if data.day <  date.today():
+            raise IncorectData
+        return DayOffDBSchema(id_master=master_id,**data.model_dump())
 
 
     def converts_application(self, data: MasterRequestSchema):

@@ -8,6 +8,8 @@ class CustomException(Exception):
 class IncorectData(CustomException):
     detail = "Неверные данные"
 
+class IncorectDate(IncorectData):
+    detail = "Неверная дата"
 
 class IncorectPhone(IncorectData):
     detail = "Неверный формат телефона"
