@@ -24,7 +24,7 @@ class MasterModel(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     id_user: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=False
+        Integer, ForeignKey("users.id",ondelete="CASCADE"), nullable=False
     )
     bio: Mapped[str] = mapped_column(Text())
 

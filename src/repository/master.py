@@ -1,4 +1,5 @@
-from sqlalchemy import update,delete
+from sqlalchemy import delete,select
+from sqlalchemy.orm import selectinload
 
 
 from src.repository.base import BaseOrmRep
@@ -13,7 +14,8 @@ from src.schemas.masters import (
     WorkDaySchema,
     DayOffSchema,
     SpecializationMasterRelationSchema,
-    MasterSpecializationSchema
+    MasterSpecializationSchema,
+    MasterDetailSchema
 )
 
 
@@ -21,6 +23,18 @@ from src.schemas.masters import (
 class MasterRepository(BaseOrmRep):
     model = MasterModel
     schema = MasterSchema
+
+    async def get_master_by_id(self,id : int):
+        query = (select(self.model)
+                 .where(self.model.id == id)
+                 .options(
+                     selectinload(self.model.specialization),
+                     selectinload(self.model.work_days),
+                     selectinload(self.model.day_offs)
+                 ))
+        result = await self.session.execute(query)
+        return MasterDetailSchema.model_validate(result.scalar_one(),from_attributes=True)
+
 
 class SpecializationMasterRelationRepository(BaseCoreRep):
     table = master_specialization_table
@@ -31,7 +45,7 @@ class SpecializationMasterRelationRepository(BaseCoreRep):
                                                                 self.table.c.masterspecialization_id.in_(list_ids)).returning(self.table)
             result = await self.session.execute(stmt)
             return [self.schema.model_validate(model,from_attributes=True) for model in result.mappings().all()]
-        
+    
 
 
 class MasterSpecializationRepository(BaseOrmRep):

@@ -94,10 +94,10 @@ async def user_logout(response: Response):
     return {"message": "OK"}
 
 
-@router.delete("/delete/{id}", summary="Удалить пользователя")
-async def user_delete(db: DbDep, id: int):
+@router.delete("/delete/{id}", summary="Удалить авторизированого пользователя")
+async def user_delete(db: DbDep, user : MeDep):
     try:
-        result = await UsersService(db).delete_user(id)
+        result = await UsersService(db).delete_user(user.user_id)
         await db.commit()
         return {"data": result}
     except UserNoFound as exc:

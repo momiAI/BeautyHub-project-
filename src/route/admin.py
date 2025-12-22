@@ -6,7 +6,8 @@ from src.schemas.service import ServiceCreateSchemas
 from src.service.masters import MastersService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound
+from src.service.users import UsersService
+from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, UserNoFound
 
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -50,3 +51,12 @@ async def add_specialization(db : DbDep,admin : AdminDep, data : MasterSpecializ
     result = await MasterSpecializationService(db).create(data)
     await db.commit()
     return {"data" : result}
+
+@router.delete("/delete/user/{id}", summary="Удалить пользователя")
+async def user_delete(db: DbDep, id: int, admin : AdminDep):
+    try:
+        result = await UsersService(db).delete_user(id)
+        await db.commit()
+        return {"data": result}
+    except UserNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)

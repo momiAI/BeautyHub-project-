@@ -28,7 +28,7 @@ class MastersService(BaseService):
 
     async def get_me(self,id : int):
         try:
-            return await self.db.master.get_object(id = id)
+            return await self.db.master.get_master_by_id(id = id)
         except NoFound:
             raise MasterNoFound
 

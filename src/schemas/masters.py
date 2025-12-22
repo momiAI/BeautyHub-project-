@@ -13,11 +13,14 @@ class MasterSchema(BaseModel):
     id_user: int
     bio: str
 
+class MasterSpecializationCreateSchema(BaseModel):
+    name : str
+
 
 class MasterDetailSchema(MasterSchema):
-    specialization: list[ServiceSchemas]
-    work_days: list[WorkDaySchema]
-    day_offs: list[DayOffSchema]
+    specialization: list[MasterSpecializationCreateSchema] | None = None
+    work_days: list[WorkDaySchema] | None = None
+    day_offs: list[DayOffSchema] | None =None
 
 class MasterBioUpdateSchema(BaseModel):
     bio : str
@@ -57,11 +60,9 @@ class SpecializationMasterRelationSchema(BaseModel):
     master_id : int 
     masterspecialization_id : int
 
-class MasterSpecializationCreateSchema(BaseModel):
-    name : str
-
-class MasterSpecializationSchema(MasterSpecializationCreateSchema):
-    id : int
 
 class MasterDepSchema(UserDepSchema):
     role_id : int 
+    
+class MasterSpecializationSchema(MasterSpecializationCreateSchema):
+    id : int
