@@ -8,6 +8,7 @@ from src.repository.master import (
     MasterSpecializationRepository
 )
 from src.repository.service import ServiceRepository,ServiceRelationMasterRepository
+from src.repository.reception import ReceptionRepository
 
 
 class DbManager:
@@ -25,9 +26,12 @@ class DbManager:
         self.dayoff = DayOffRepository(self.session)
         self.master_specialization = MasterSpecializationRepository(self.session)
         self.master_specialization_relation = SpecializationMasterRelationRepository(self.session)
-        self.service_relation = ServiceRelationMasterRepository(self.session)
+    
 
         self.service = ServiceRepository(self.session)
+        self.service_relation = ServiceRelationMasterRepository(self.session)
+
+        self.reception = ReceptionRepository(self.session)
 
         return self
 
