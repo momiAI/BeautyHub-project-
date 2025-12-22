@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException
 
-from src.route.dependency import UserDep, DbDep, AdminDep, MasterDep
+from src.route.dependency import UserDep, DbDep, MasterDep
 from src.schemas.masters import MasterCreateRequestSchema, MasterUpdateSchema
 from src.schemas.workday import WorkDayRequstSchema
 from src.service.masters import MastersService
@@ -69,20 +69,6 @@ async def application(
         )
     except IdSpecializationNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
-
-
-@router.post(
-    path="/confirm/{id}", summary="Одобрение заявки на добавления мастера админом"
-)
-async def confirm_application(id: int, db: DbDep, admin: AdminDep):
-    try:
-        result = await MastersService(db).confirm(id)
-        await db.commit()
-        return {"data": result}
-    except ApplicationNoFound as exc:
-        raise HTTPException(status_code=404, detail=exc.detail)
-    except ApplicationApproved as exc:
-        raise HTTPException(status_code=409, detail=exc.detail)
 
 
 @router.patch(path="/update", summary="Обновление данных")
