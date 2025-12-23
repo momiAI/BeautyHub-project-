@@ -72,3 +72,12 @@ async def service_delete(db : DbDep, id : int, admin : AdminDep):
         return {"data" : result}
     except ServiceNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
+
+@router.patch("/user/create-administrator/{id_user}", summary="Сделать пользователя администратором")
+async def create_administrator(db : DbDep, id_user : int, admin : AdminDep):
+    try: 
+        result = await UsersService(db).replace_role_the_administrator(id_user)
+        await db.commit()
+        return {"data" : result}
+    except UserNoFound as exc:
+        raise HTTPException(status_code=404,detail=exc.detail)

@@ -20,6 +20,8 @@ class MultipleResult(CustomException):
 class UniqueError(CustomException):
     detail = "Объект уже существует"
 
+class ClientListUniqueError(UniqueError):
+    detail = "Вы уже записаны на приём у данного мастера, на указанную дату."
 
 class UserUniqueError(UniqueError):
     detail = "Пользователь уже существует."

@@ -26,6 +26,7 @@ def user_dependency(role: UserRoleEnum | None = None):
             )
             if role:
                 if role != user.role:
+                    print(role, user.role)
                     raise HTTPException(
                         status_code=403,
                         detail="Недостаточно прав для выполнения запроса!",
@@ -53,3 +54,4 @@ MeDep = Annotated[UserDepSchema, Depends(user_dependency())]
 UserDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.CLIENT))]
 AdminDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.ADMIN))]
 MasterDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.MASTER))]
+AministratorDep = Annotated[UserDepSchema,Depends(user_dependency(UserRoleEnum.ADMINISTRATOR))]

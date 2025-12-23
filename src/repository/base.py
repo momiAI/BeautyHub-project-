@@ -23,6 +23,14 @@ class BaseOrmRep:
         result = await self.session.execute(query)
         return [self.schema.model_validate(model,from_attributes=True) for model in result.scalars().all()]
     
+    async def get_object_or_none(self, **kwargs):
+        query = await self.session.execute(select(self.model).filter_by(**kwargs))
+        result = query.scalars().one_or_none()
+        if result is None:
+            return None
+        else:
+            return self.schema.model_validate(result, from_attributes=True)
+
 
     async def get_object(self, **kwargs):
         try:

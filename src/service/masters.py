@@ -1,5 +1,5 @@
 from src.service.base import BaseService
-from src.schemas.users import UserUpdateMasterSchema
+from src.schemas.users import UserRoleUpdateSchema
 from src.schemas.masters import (
     MasterCreateRequestSchema,
     MasterRequestConfirmSchema,
@@ -80,7 +80,7 @@ class MastersService(BaseService):
                 raise ApplicationApproved
             application = master_utils.converts_application(master_request)
             await self.db.master_request.update(id, MasterRequestConfirmSchema())
-            await self.db.user.update(application.id_user, UserUpdateMasterSchema())
+            await self.db.user.update(application.id_user, UserRoleUpdateSchema(UserRoleEnum.MASTER))
             master =  await self.db.master.create(application)
             await self.db.master_specialization_relation.create_bulk(
                 [

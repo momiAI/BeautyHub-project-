@@ -15,3 +15,6 @@ class ReceptionCreateSchema(ReceptionRequestSchema):
 
 class ReceptionSchema(ReceptionCreateSchema):
     id : int
+
+class ReceptionUpdateStatusSchema(BaseModel):
+    status : ReceptionStatusEnum

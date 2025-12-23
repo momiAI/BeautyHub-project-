@@ -1,6 +1,6 @@
 from src.models.enum import UserRoleEnum
 from src.service.base import BaseService
-from src.schemas.users import UserCreate, UserLogin
+from src.schemas.users import UserCreate, UserLogin,UserRoleUpdateSchema
 from src.utils.users_utils import user_utils
 from src.utils.exceptions import (
     UniqueError,
@@ -56,5 +56,11 @@ class UsersService(BaseService):
     async def delete_user(self, id: int):
         try:
             return await self.db.user.delete_by_id(id)
+        except NoFound:
+            raise UserNoFound
+
+    async def replace_role_the_administrator(self,id : int):
+        try:
+            return await self.db.user.update(id,UserRoleUpdateSchema(role = UserRoleEnum.ADMINISTRATOR))
         except NoFound:
             raise UserNoFound

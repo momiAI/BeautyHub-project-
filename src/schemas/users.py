@@ -15,8 +15,8 @@ class UserDB(BaseModel):
     role: UserRoleEnum
 
 
-class UserUpdateMasterSchema(BaseModel):
-    role: UserRoleEnum = UserRoleEnum.MASTER
+class UserRoleUpdateSchema(BaseModel):
+    role: UserRoleEnum
 
 
 class User(UserDB):

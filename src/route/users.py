@@ -58,12 +58,20 @@ async def user_login(
     data: UserLogin = Body(
         openapi_examples={
             "1": {
-                "summary": "Vlad",
+                "summary": "Master",
                 "value": {"phone": "+79394455771", "password": "abcd1234"},
             },
             "2": {
                 "summary": "Admin",
                 "value": {"phone": "+79493322661", "password": "abcde1234"},
+            },
+            "3": {
+                "summary": "Client",
+                "value": {"phone": "+79392211445", "password": "abcd1234"},
+            },
+            "4" : {
+                "summary" : "Administrator",
+                 "value" : {"phone": "+79394477221","password": "abcd1234"},
             }
         }
     ),

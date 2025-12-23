@@ -14,7 +14,15 @@ class UserRoleEnum(str, Enum):
     ADMIN = "admin"
     MASTER = "master"
     CLIENT = "client"
+    ADMINISTRATOR = "administrator"
 
+class ReceptionAdministraotStatusEnum(str,Enum):
+    CONFIRMED = "confirmed"
+    IN_PROGRESS = "in_progress"    
+    COMPLETED = "completed"
+    NO_SHOW = "no_show"
+    RESCHEDULED = "rescheduled"
+    REFUNDED = "refunded"
 
 class ReceptionStatusEnum(str, Enum):
     PENDING = "pending"

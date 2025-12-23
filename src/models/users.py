@@ -1,5 +1,5 @@
 from src.database import Base
-from sqlalchemy import Integer, String, Enum, ForeignKey
+from sqlalchemy import Integer, String, Enum, ForeignKey,CheckConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 from src.models.enum import UserRoleEnum
 
@@ -11,12 +11,4 @@ class UsersModel(Base):
     phone: Mapped[str] = mapped_column(String(20), unique=True)
     name: Mapped[str] = mapped_column(String(50))
     password_hash: Mapped[str]
-    role: Mapped[str] = mapped_column(Enum(UserRoleEnum, native_enum=False))
-
-
-class UserRatingModel(Base):
-    __tablename__ = "user_rating"
-
-    id_from: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    id_to: Mapped[int] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    rating: Mapped[int]
+    role: Mapped[str] = mapped_column(Enum(UserRoleEnum, native_enum=False,length = 15))

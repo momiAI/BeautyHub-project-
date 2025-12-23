@@ -12,6 +12,8 @@ from sqlalchemy import (
     String,
     ARRAY,
     DateTime,
+    Float,
+    CheckConstraint
 )
 from sqlalchemy.orm import mapped_column, Mapped, relationship
 
@@ -37,6 +39,8 @@ class MasterModel(Base):
     day_offs: Mapped[list["DayOffModel"]] = relationship(
         back_populates="master", cascade="all, delete-orphan"
     )
+
+    rating : Mapped[float] = mapped_column(Float, default=0.0) 
 
     services : Mapped[list["MasterServiceModel"]] = relationship(back_populates="master")# noqa: F821 # type: ignore
 
@@ -99,3 +103,17 @@ class MasterRequestModel(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), nullable=False
     )
+
+
+class MasterRatingModel(Base):
+    __tablename__ = "master_rating"
+
+    id_from: Mapped[int] = mapped_column(ForeignKey("client.id"), primary_key=True)
+    id_to: Mapped[int] = mapped_column(ForeignKey("master.id"), primary_key=True)
+    rating: Mapped[int]
+
+    __table_args__ = (
+        CheckConstraint(
+        "rating >= 1 AND rating <= 5", name = "ck_example_value_range_1_5"
+    ),
+)
