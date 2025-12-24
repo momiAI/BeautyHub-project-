@@ -10,7 +10,7 @@ class ReceptionRequestSchema(BaseModel):
     date_time: datetime
 
 class ReceptionCreateSchema(ReceptionRequestSchema):
-    id_user: int
+    id_client: int
     status: ReceptionStatusEnum
 
 class ReceptionSchema(ReceptionCreateSchema):

@@ -20,6 +20,9 @@ class MultipleResult(CustomException):
 class UniqueError(CustomException):
     detail = "Объект уже существует"
 
+class ClientUniqueError(UniqueError):
+    detail = "Клиент уже существует."
+
 class ClientListUniqueError(UniqueError):
     detail = "Вы уже записаны на приём у данного мастера, на указанную дату."
 
@@ -29,6 +32,9 @@ class UserUniqueError(UniqueError):
 
 class NoFound(CustomException):
     detail = "Объект не найден"
+
+class ClientNoFound(NoFound):
+    detail = "Клиент не найден"
 
 class IdSpecializationNoFound(NoFound):
     detail = "Специализация не найдена."

@@ -11,7 +11,7 @@ from src.route.service import router as service_router
 from src.route.master_specialization import router as master_specialization_router
 from src.route.admin import router as admin_router
 from src.route.reception import router as reception_router
-
+from src.route.client import router as client_router
 
 app = FastAPI()
 
@@ -21,6 +21,7 @@ app.include_router(service_router)
 app.include_router(master_specialization_router)
 app.include_router(admin_router)
 app.include_router(reception_router)
+app.include_router(client_router)
 
 
 if __name__ == "__main__":

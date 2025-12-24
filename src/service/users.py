@@ -1,7 +1,10 @@
 from src.models.enum import UserRoleEnum
 from src.service.base import BaseService
 from src.schemas.users import UserCreate, UserLogin,UserRoleUpdateSchema
+from src.schemas.client import ClientUpdateUserSchema
 from src.utils.users_utils import user_utils
+from src.schemas.client import ClientDbSchema
+from src.service.client import ClientService
 from src.utils.exceptions import (
     UniqueError,
     UserUniqueError,
@@ -27,11 +30,12 @@ class UsersService(BaseService):
             )
             if user_utils.verify_password(data.password, user.password_hash) is False:
                 raise IncorectData
+            client = await self.db.client.get_object_or_none(id_user = user.id)
             if user.role != UserRoleEnum.MASTER:
-                return user_utils.create_access_refresh_tokens(user.id,user.role)
+                return user_utils.create_access_refresh_tokens(id_user=user.id,role=user.role,id_client=client.id)
             else:
                 master = await self.db.master.get_object(id_user = user.id)
-                return user_utils.create_access_refresh_tokens(user.id,user.role, master.id)
+                return user_utils.create_access_refresh_tokens(id_user=user.id,role=user.role,id_role=master.id,id_client=client.id)
         
         except NoFound:
             raise UserNoFound
@@ -47,7 +51,13 @@ class UsersService(BaseService):
     async def create_user(self, data: UserCreate):
         try:
             data_update = user_utils.converts_data(data)
-            return await self.db.user.create(data_update)
+            client = await self.db.client.get_object_or_none(phone = data_update.phone)
+            user = await self.db.user.create(data_update)
+            if client is None:
+                await ClientService(self.db).create_client(phone = data_update.phone, id_user=user.id)
+            else:
+                await self.db.client.update(client.id,ClientUpdateUserSchema(id_user=user.id))
+            return user
         except UniqueError:
             raise UserUniqueError
         except IncorectPhone:

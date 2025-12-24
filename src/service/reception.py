@@ -7,13 +7,13 @@ from src.models.enum import ReceptionStatusEnum
 
 class RecepionService(BaseService):
 
-    async def subscribe(self,id_user : int, data : ReceptionRequestSchema):
-        check = await self.db.reception.get_object_or_none(id_user = id_user, id_master = data.id_master, date_time = data.date_time)
+    async def subscribe(self,id_client : int, data : ReceptionRequestSchema):
+        check = await self.db.reception.get_object_or_none(id_client = id_client, id_master = data.id_master, date_time = data.date_time)
         if check is not None:
             raise ClientListUniqueError
 
         try: 
-            data_update = reception_utils.check_date_and_convert_requst_data(id_user,data)
+            data_update = reception_utils.check_date_and_convert_requst_data(id_client,data)
             return await self.db.reception.create(data_update)
         except IncorectData:
             raise IncorectDate

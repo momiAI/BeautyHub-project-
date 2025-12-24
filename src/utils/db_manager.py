@@ -9,6 +9,7 @@ from src.repository.master import (
 )
 from src.repository.service import ServiceRepository,ServiceRelationMasterRepository
 from src.repository.reception import ReceptionRepository
+from src.repository.client import ClientRepository,ClientRatingRelationRepository
 
 
 class DbManager:
@@ -19,6 +20,9 @@ class DbManager:
         self.session = self.session_factory()
 
         self.user = UsersRepository(self.session)
+
+        self.client = ClientRepository(self.session)
+        self.client_rating = ClientRatingRelationRepository(self.session)
 
         self.master = MasterRepository(self.session)
         self.master_request = MasterRequestRepository(self.session)

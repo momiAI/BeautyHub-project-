@@ -9,7 +9,7 @@ class ReceptionModel(Base):
     __tablename__ = "reception"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    id_user: Mapped[int] = mapped_column(Integer, ForeignKey("users.id", ondelete="CASCADE"))
+    id_client: Mapped[int] = mapped_column(Integer, ForeignKey("client.id", ondelete="CASCADE"))
     id_master: Mapped[int] = mapped_column(Integer, ForeignKey("master.id", ondelete="CASCADE"))
     id_service: Mapped[int] = mapped_column(Integer, ForeignKey("service.id"))
     date_time: Mapped[datetime]

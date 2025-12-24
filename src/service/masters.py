@@ -80,7 +80,7 @@ class MastersService(BaseService):
                 raise ApplicationApproved
             application = master_utils.converts_application(master_request)
             await self.db.master_request.update(id, MasterRequestConfirmSchema())
-            await self.db.user.update(application.id_user, UserRoleUpdateSchema(UserRoleEnum.MASTER))
+            await self.db.user.update(id = application.id_user,values =  UserRoleUpdateSchema(role =UserRoleEnum.MASTER))
             master =  await self.db.master.create(application)
             await self.db.master_specialization_relation.create_bulk(
                 [

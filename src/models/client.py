@@ -8,7 +8,7 @@ class ClientModel(Base):
     __tablename__ = "client"
 
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
-    id_user : Mapped[int | None] = mapped_column(Integer,ForeignKey("users.id",ondelete="CASCADE"), nullable=True)
+    id_user : Mapped[int | None] = mapped_column(Integer,ForeignKey("users.id",ondelete="SET NULL"), nullable=True)
     phone: Mapped[str] = mapped_column(String(20), unique=True)
     is_guest : Mapped[bool] = mapped_column(Boolean)
     rating : Mapped[float] = mapped_column(Float, default= 0.0)
