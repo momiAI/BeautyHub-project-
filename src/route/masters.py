@@ -1,14 +1,17 @@
 from fastapi import APIRouter, Body, HTTPException
 
+from src.models.enum import ReceptionStatusEnum
 from src.route.dependency import UserDep, DbDep, MasterDep
 from src.schemas.masters import MasterCreateRequestSchema, MasterUpdateSchema
 from src.schemas.dayoff import DayOffCreateSchema
 from src.service.masters import MastersService
+from src.service.reception import RecepionService
 from src.utils.exceptions import (
     CancleRequestAndColldownError,
     MasterRequestAlreadyInProgressError,
     MasterRequestCooldownError,
     MasterRequestUniqueError,
+    NoFound,
     RoleNotAllowedError,
     MasterNoFound,
     IdSpecializationNoFound,
@@ -115,3 +118,11 @@ async def update_master(
     except IdSpecializationNoFound as exc:
         return HTTPException(status_code=404,detail=exc.detail)
 
+@router.patch(path="/master/cancel/{id_form}", summary="Отмена записи мастером")
+async def cancel_recording(id_form : int,db : DbDep, master : MasterDep):
+    try:
+        result = await RecepionService(db).patch_status_form(id_form=id_form,id_master=master.role_id,status=ReceptionStatusEnum.CANCELLED_BY_MASTER)
+        await db.commit()
+        return {"data" : result}
+    except NoFound:
+        raise HTTPException(status_code=404, detail="Запись не найдена.")

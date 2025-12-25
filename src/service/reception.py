@@ -18,11 +18,8 @@ class RecepionService(BaseService):
         except IncorectData:
             raise IncorectDate
 
-    async def patch_status_form(self,id_form : int,status : ReceptionStatusEnum,id_user : int | None = None, id_master : int | None = None):
-        if id_user:
-            check = await self.db.reception.get_object_or_none(id = id_form, id_user = id_user)
-        if id_master:
-            check = await self.db.reception.get_object_or_none(id = id_form, id_master = id_master)
+    async def patch_status_form(self,id_form : int,status : ReceptionStatusEnum,id_client : int ):
+        check = await self.db.reception.get_object_or_none(id = id_form, id_client = id_client)
 
         if check is None:
             raise NoFound
