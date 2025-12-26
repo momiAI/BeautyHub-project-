@@ -102,7 +102,7 @@ async def user_logout(response: Response):
     return {"message": "OK"}
 
 
-@router.delete("/delete/{id}", summary="Удалить авторизированого пользователя")
+@router.delete("/delete", summary="Удалить авторизированого пользователя")
 async def user_delete(db: DbDep, user : MeDep):
     try:
         result = await UsersService(db).delete_user(user.user_id)
