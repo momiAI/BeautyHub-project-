@@ -33,6 +33,6 @@ array_users_data = [
         phone = '76362233445',
         name = 'Client for master',
         password_hash= hash_password,
-        role = UserRoleEnum.ADMIN
+        role = UserRoleEnum.CLIENT
     )
 ]

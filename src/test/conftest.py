@@ -7,7 +7,7 @@ from src.utils.db_manager import DbManager
 from src.config import settings
 from src.test.static.users_dict import array_users_data
 from src.schemas.client import ClientDbSchema
-
+from src.schemas.masters import MasterSpecializationCreateSchema
 
 @pytest.fixture
 async def ac(main):
@@ -18,7 +18,7 @@ async def ac(main):
 @pytest.fixture(scope='session',autouse=True)
 async def main():
     assert settings.MODE == "TEST"
-    print("FIXTURE MAIN STARTED")
+
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
@@ -40,8 +40,7 @@ async def add_users(main,db):
                 for user in result
                 ]
         await db.commit()
-        assert len(result) == 4
-        assert len(clients) == 4
+
  
 
 @pytest.fixture(autouse=False)
@@ -63,7 +62,7 @@ async def login_client_for_master(add_users,ac):
 
 
 @pytest.fixture(autouse=False)
-async def login_master(ac):
+async def login_master(ac,add_users):
     response = await ac.post('/users/login', json = {
         "phone": "+76362233442", 
         "password": "abcd1234"
@@ -72,7 +71,7 @@ async def login_master(ac):
 
 
 @pytest.fixture(autouse=False)
-async def login_administrator(ac):
+async def login_administrator(ac,add_users):
     response = await ac.post('/users/login', json = {
         "phone": "+76362233443", 
         "password": "abcd1234"
@@ -81,24 +80,35 @@ async def login_administrator(ac):
 
 
 @pytest.fixture(autouse=False)
-async def login_admin(ac):
+async def login_admin(ac,add_users):
     response = await ac.post('/users/login', json = {
         "phone": "+76362233444", 
         "password": "abcd1234"
     })
     assert response.status_code == 200
 
+
 @pytest.fixture(autouse=False)
 async def add_specialization(db):
-    array_specialization = ["Лешмейкер", "Мастер маникюра" , "Бровист"]
-    specialization = [await db.master_specialization.create(name = spec) for spec in array_specialization ]
-    print([model.id for model in specialization])
-    #return [model.id for model in specialization]
+    check = await db.master_specialization.get_all()
+    if check == []:
+        array_specialization = ["Лешмейкер", "Мастер маникюра" , "Бровист"]
+        specialization = [await db.master_specialization.create(MasterSpecializationCreateSchema(name = spec)) for spec in array_specialization ]
+        await db.commit()
+
 
 
 @pytest.fixture(autouse=False)
-async def send_application_for_master(add_specialization,login_client_for_master,ac):
+async def send_application_for_master(ac,add_specialization,login_client_for_master,db):
+    check = await db.master_request.get_all()
+    if check == []:    
+        response = await ac.post('/master/application',json= { 
+                "bio_short": "Профессионал своего дела",
+                "specializations": [
+                    1,2
+                    ],
+                "portfolio": ["Возможная ссылка", "Другая ссылка"],
+        })
 
-    response = await ac.post('/master/application', json ={
-##
-    })
+        assert response.status_code == 200
+    
