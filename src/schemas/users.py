@@ -36,6 +36,7 @@ class UserLogin(BaseModel):
 
 
 class UserDepSchema(BaseModel):
+    client_id : int 
     user_id: int
     role: UserRoleEnum
     exp: int

@@ -43,7 +43,6 @@ class MastersService(BaseService):
     async def request_application(
         self, id_user: int, data: MasterCreateRequestSchema, role: str
     ):
-        data_update = master_utils.converts_request_data(id_user, data)
         
         if role != UserRoleEnum.CLIENT:
             raise RoleNotAllowedError
@@ -52,6 +51,10 @@ class MastersService(BaseService):
             await self.db.master_specialization.check_ids(data.specializations)
         except NoFound:
             raise IdSpecializationNoFound
+        
+        
+        data_update = master_utils.converts_request_data(id_user, data)
+        
 
         try:
             application = await self.db.master_request.get_object(id_user=id_user)

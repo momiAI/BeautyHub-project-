@@ -26,8 +26,16 @@ async def test_add_service(add_specialization,login_admin,ac,specialization_id,n
     (2,404),
     (1,409)
 ])
-async def test_confirm_application(ac,send_application_for_master,login_admin,id_application,status_code):
+async def test_confirm_application(ac,send_application_for_master,login_admin,id_application,status_code,db):
     response = await ac.post(f'/admin/master/confirm/{id_application}')
-    
+
     assert response.status_code == status_code
-    
+
+
+async def test_create_administrator(ac, login_admin,db):
+
+    user = await db.user.get_object(phone = '76362233445')
+    response = await ac.patch(f'/admin/user/create-administrator/{user.id}')
+
+    assert response.status_code == 200
+    assert 'data' in response.json()

@@ -13,7 +13,7 @@ router = APIRouter(prefix="/client",tags=['Клиент'])
 
 
 
-@router.post(path="/user/subscribe/",summary="Записаться к мастеру")
+@router.post(path="/subscribe/",summary="Записаться к мастеру")
 async def subscribe_to_master(db : DbDep,user : MeDep,data : ReceptionRequestSchema = Body(openapi_examples={"1" : {
     "summary" : "Записаться",
     "value" : {

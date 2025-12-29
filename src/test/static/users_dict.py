@@ -34,5 +34,11 @@ array_users_data = [
         name = 'Client for master',
         password_hash= hash_password,
         role = UserRoleEnum.CLIENT
+    ),
+        UserDB(
+        phone = '76362233446',
+        name = 'Client for master',
+        password_hash= hash_password,
+        role = UserRoleEnum.CLIENT
     )
 ]

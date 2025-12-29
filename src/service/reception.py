@@ -24,4 +24,7 @@ class RecepionService(BaseService):
         if check is None:
             raise NoFound
         
+        if check.status == status:
+            return 'No-op'
+
         return await self.db.reception.update(id_form, ReceptionUpdateStatusSchema(status= status))
