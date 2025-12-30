@@ -25,7 +25,8 @@ router = APIRouter(prefix="/master", tags=["Мастера"])
 @router.get(path="/me",summary="Получение мастера")
 async def me(db : DbDep, master : MasterDep):
     try:
-        return await MastersService(db).get_me(master.role_id)
+        result =  await MastersService(db).get_me(master.role_id)
+        return {'data' : result}
     except MasterNoFound as exc:
         raise HTTPException(status_code=404,detail=exc.detail)
 
@@ -118,7 +119,7 @@ async def update_master(
     except IdSpecializationNoFound as exc:
         return HTTPException(status_code=404,detail=exc.detail)
 
-@router.patch(path="/master/cancel/{id_form}", summary="Отмена записи мастером")
+@router.patch(path="/cancel/{id_form}", summary="Отмена записи мастером")
 async def cancel_recording(id_form : int,db : DbDep, master : MasterDep):
     try:
         result = await RecepionService(db).patch_status_form(id_form=id_form,id_master=master.role_id,status=ReceptionStatusEnum.CANCELLED_BY_MASTER)

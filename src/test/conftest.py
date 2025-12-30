@@ -1,4 +1,6 @@
 import pytest
+from datetime import datetime,timedelta
+
 
 from src.main import app
 from httpx import AsyncClient,ASGITransport
@@ -8,7 +10,9 @@ from src.config import settings
 from src.test.static.users_dict import array_users_data
 from src.schemas.client import ClientDbSchema
 from src.schemas.masters import MasterSpecializationCreateSchema,MasterDBSchema
-
+from src.schemas.reception import ReceptionCreateSchema
+from src.utils.users_utils import user_utils
+from src.models.enum import ReceptionStatusEnum
 
 @pytest.fixture
 async def ac(main):
@@ -43,10 +47,10 @@ async def add_users(main,db):
         await db.commit()
 
 @pytest.fixture(autouse=False)
-async def add_master(add_users,db):
-    check = await db.master.get_all()
-    if check == []:
-        user = await db.user.get_object(phone = '76362233442')
+async def add_master(db,add_users):
+    user = await db.user.get_object(phone = '76362233442')
+    check = await db.master.get_object_or_none(id_user = user.id)
+    if check is None:
         result = await db.master.create(MasterDBSchema(id_user=user.id,bio='Master test'))
         await db.commit()
         return result
@@ -68,6 +72,8 @@ async def login_client_for_master(add_users,ac):
         "password": "abcd1234"
     })
     assert response.status_code == 200
+    client = user_utils.decode_token(access_token=response.cookies.get('access_token'))
+    return client
 
 @pytest.fixture(autouse=False)
 async def login_client_for_master_1(add_users,ac):
@@ -75,11 +81,12 @@ async def login_client_for_master_1(add_users,ac):
         "phone": "+76362233446", 
         "password": "abcd1234"
     })
+    
     assert response.status_code == 200
+    assert response.cookies.get('access_token') is not None
 
 @pytest.fixture(autouse=False)
-async def login_master(add_master,ac):
-    
+async def login_master(add_master,ac,db):
     response = await ac.post('/users/login', json = {
         "phone": "+76362233442", 
         "password": "abcd1234"
@@ -127,4 +134,17 @@ async def send_application_for_master(ac,add_specialization,login_client_for_mas
         })
 
         assert response.status_code == 200
-    
+
+@pytest.fixture(autouse=False)
+async def record_for_master(db,login_client_for_master):
+    user = await db.user.get_object(phone = '76362233442')
+    master = await db.master.get_object(id_user = user.id)
+    request = await db.reception.create(ReceptionCreateSchema(
+        id_master= master.id,
+        id_client=login_client_for_master['client_id'],
+        id_service=1,
+        date_time=datetime.now() + timedelta(days=1),
+        status=ReceptionStatusEnum.CONFIRMED
+    ))
+    await db.commit()
+    return request
