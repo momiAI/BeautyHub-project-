@@ -4,6 +4,7 @@ from src.route.dependency import DbDep, MeDep
 from src.schemas.users import UserCreate, UserLogin
 from src.service.users import UsersService
 from src.utils.exceptions import (
+    IncorectName,
     IncorectPhone,
     UserUniqueError,
     UserNoFound,
@@ -48,6 +49,8 @@ async def user_create(
     except UserUniqueError as exc:
         raise HTTPException(status_code=409, detail=exc.detail)
     except IncorectPhone as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
+    except IncorectName as exc:
         raise HTTPException(status_code=400, detail=exc.detail)
 
 

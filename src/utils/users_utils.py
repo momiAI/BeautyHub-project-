@@ -6,6 +6,7 @@ from pwdlib import PasswordHash
 from src.schemas.users import UserDB, UserCreate
 from src.models.enum import UserRoleEnum
 from src.utils.exceptions import (
+    IncorectName,
     IncorectPhone,
     IncorectToken,
     TokenTimeIsOver,
@@ -80,6 +81,8 @@ class UserUtils:
         return password_hash.hash(password)
 
     def converts_data(self, data: UserCreate):
+        if len(data.name) < 2:
+            raise IncorectName
         phone = self.validate_phone(data.phone)
         return UserDB(
             phone=phone,

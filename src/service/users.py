@@ -6,6 +6,7 @@ from src.utils.users_utils import user_utils
 from src.schemas.client import ClientDbSchema
 from src.service.client import ClientService
 from src.utils.exceptions import (
+    IncorectName,
     UniqueError,
     UserUniqueError,
     IncorectPhone,
@@ -62,6 +63,8 @@ class UsersService(BaseService):
             raise UserUniqueError
         except IncorectPhone:
             raise IncorectPhone
+        except IncorectName:
+            raise IncorectName
 
     async def delete_user(self, id: int):
         try:

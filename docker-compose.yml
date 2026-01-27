@@ -3,7 +3,10 @@ services:
     container_name: "beautyhub_back"
 
     build: .
-
+    depends_on:
+      app_db_service:
+        condition: service_healthy
+    
     ports:
       - 7777:8000
     networks:
@@ -24,6 +27,11 @@ services:
       - appNetwork
     volumes:
       - pg-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 10
     env_file:
       - .envdocker
 

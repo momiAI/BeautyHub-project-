@@ -14,6 +14,9 @@ class IncorectDate(IncorectData):
 class IncorectPhone(IncorectData):
     detail = "Неверный формат телефона"
 
+class IncorectName(IncorectData):
+    detail = 'Длина имени должна быть больше одно'
+
 class MultipleResult(CustomException):
     detail = "Ожидалось получить одну строчку, но было найдено множество."
 
