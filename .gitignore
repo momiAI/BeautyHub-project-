@@ -10,3 +10,4 @@
 src/repository/__pycache__/base.cpython-312.pyc
 *.pyc
 test.py
+scip
