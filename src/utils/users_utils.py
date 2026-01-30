@@ -11,6 +11,7 @@ from src.utils.exceptions import (
     IncorectToken,
     TokenTimeIsOver,
     TokenDublicate,
+    UserUpdateCooldownError
 )
 from src.config import settings
 
@@ -102,4 +103,6 @@ class UserUtils:
 
         return access_token,refresh_token
 
+
+    
 user_utils = UserUtils()

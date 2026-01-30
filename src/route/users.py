@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Body, HTTPException, Response, Cookie
 
 from src.route.dependency import DbDep, MeDep
-from src.schemas.users import UserCreate, UserLogin
+from src.schemas.users import UserCreate, UserLogin,UserRequestUpdateSchema
 from src.service.users import UsersService
 from src.utils.exceptions import (
     IncorectName,
@@ -9,6 +9,7 @@ from src.utils.exceptions import (
     UserUniqueError,
     UserNoFound,
     IncorectData,
+    UserUpdateCooldownError
 )
 
 
@@ -23,8 +24,27 @@ async def user_me(db: DbDep, user: MeDep):
     except UserNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
 
-        
 
+@router.patch('/update', summary='Обновление данных пользователя')
+async def user_update(db : DbDep, user : MeDep, data : UserRequestUpdateSchema = Body(openapi_examples={
+    "1" : {
+        "summary" : 'Обновление',
+        "value" : {
+            'phone' : '+79394455771',
+            'name' : 'Momy'
+        }
+    }
+})):
+    try:
+        result = await UsersService(db).update_user(id_user = user.user_id, data=data)
+        await db.commit()
+        return result 
+    except IncorectPhone as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
+    except UserUniqueError as exc:
+        raise HTTPException(status_code=409, detail='Пользователь с таким номером уже существует, если вы хотите перенести историю посещений на аккаунт пожалуйста обратитесь к администратору.')
+    except UserUpdateCooldownError as exc:
+        raise HTTPException(status_code=429, detail=exc.detail)
 
 @router.post("/create", summary="Создание пользователя")
 async def user_create(

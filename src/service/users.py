@@ -1,8 +1,9 @@
 from src.models.enum import UserRoleEnum
 from src.service.base import BaseService
-from src.schemas.users import UserCreate, UserLogin,UserRoleUpdateSchema
+from src.schemas.users import UserCreate, UserLogin,UserRoleUpdateSchema,UserUpdateSchema,UserRequestUpdateSchema
 from src.schemas.client import ClientUpdateUserSchema
 from src.utils.users_utils import user_utils
+from src.utils.date_utils import date_utils
 from src.schemas.client import ClientDbSchema
 from src.service.client import ClientService
 from src.utils.exceptions import (
@@ -14,6 +15,7 @@ from src.utils.exceptions import (
     UserNoFound,
     IncorectData,
     IncorectToken,
+    UserUpdateCooldownError
 )
 
 
@@ -23,6 +25,31 @@ class UsersService(BaseService):
             return await self.db.user.get_object(id=id)
         except NoFound:
             raise UserNoFound
+
+    async def update_user(self,id_user : int,data : UserRequestUpdateSchema):
+        try:
+            user = await self.db.user.get_object(id = id_user)
+            if user.last_update:
+                date_utils.check_last_update(user.last_update)
+            if data.phone:
+                phone = user_utils.validate_phone(data.phone)
+                check_unique_phone = await self.db.user.get_object_or_none(phone = phone)
+                if check_unique_phone:
+                    raise UserUniqueError
+            else:
+                phone = None
+            return await self.db.user.update(
+                id = id_user,
+                values = UserUpdateSchema.model_validate({
+                    'phone' : phone,
+                    'name' : data.name,
+                    'last_update' : date_utils.now
+                })
+            )
+        except IncorectPhone:
+            raise IncorectPhone
+        except UserUpdateCooldownError: 
+            raise UserUpdateCooldownError
 
     async def login_user(self, data: UserLogin):
         try:

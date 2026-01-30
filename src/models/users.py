@@ -1,5 +1,7 @@
+from datetime import date,datetime,timezone
+
 from src.database import Base
-from sqlalchemy import Integer, String, Enum, ForeignKey,CheckConstraint
+from sqlalchemy import Integer, String, Enum, ForeignKey,CheckConstraint,DateTime
 from sqlalchemy.orm import Mapped, mapped_column
 from src.models.enum import UserRoleEnum
 
@@ -12,3 +14,4 @@ class UsersModel(Base):
     name: Mapped[str] = mapped_column(String(50))
     password_hash: Mapped[str]
     role: Mapped[str] = mapped_column(Enum(UserRoleEnum, native_enum=False,length = 15))
+    last_update : Mapped[datetime | None] = mapped_column(DateTime(timezone=True),nullable=True)

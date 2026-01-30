@@ -45,7 +45,7 @@ class BaseOrmRep:
         result = await self.session.execute(
             update(self.model)
             .where(self.model.id == id)
-            .values(**values.model_dump())
+            .values(**values.model_dump(exclude_none=True))
             .returning(self.model)
         )
         return self.schema.model_validate(result.scalar_one(), from_attributes=True)

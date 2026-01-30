@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 from src.models.enum import UserRoleEnum
 
@@ -22,6 +23,7 @@ class UserRoleUpdateSchema(BaseModel):
 class User(UserDB):
     id: int
     rating: list[Rating] = []
+    last_update : datetime | None = None
 
 
 class UserCreate(BaseModel):
@@ -40,3 +42,11 @@ class UserDepSchema(BaseModel):
     user_id: int
     role: UserRoleEnum
     exp: int
+
+class UserRequestUpdateSchema(BaseModel):
+    phone : str | None = None
+    name: str | None = None
+
+
+class UserUpdateSchema(UserRequestUpdateSchema):
+    last_update : datetime

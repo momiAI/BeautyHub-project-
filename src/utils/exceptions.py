@@ -73,6 +73,8 @@ class TokenDublicate(CustomException):
 class RequestCooldownError(CustomException):
     detail = "Действие соверешенно в короткий период"
 
+class UserUpdateCooldownError(RequestCooldownError):
+    detail = "Обновить свои данные можно 1 раз в 24 часа."
 
 class CancleRequestAndColldownError(RequestCooldownError):
     detail = (
