@@ -11,6 +11,9 @@ class IncorectData(CustomException):
 class IncorectDate(IncorectData):
     detail = "Неверная дата"
 
+class IncorectNowPassword(IncorectData):
+    detail = "Неверный текущий пароль"
+
 class IncorectPhone(IncorectData):
     detail = "Неверный формат телефона"
 
@@ -22,6 +25,9 @@ class MultipleResult(CustomException):
 
 class UniqueError(CustomException):
     detail = "Объект уже существует"
+
+class PasswordDuplicate(UniqueError):
+    detail = "Новый пароль должен отличаться от старого."
 
 class ClientUniqueError(UniqueError):
     detail = "Клиент уже существует."
@@ -96,3 +102,6 @@ class MasterRequestAlreadyInProgressError(UniqueError):
 
 class RoleNotAllowedError(CustomException):
     detail = "Не подходящая роль"
+
+class PasswordNotMatch(CustomException):
+    detail = 'Пароли не совпадают.'

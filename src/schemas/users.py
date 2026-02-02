@@ -8,11 +8,12 @@ class Rating(BaseModel):
     id_to: int
     rating: int
 
+class UserUpdatePasswordBdSchema(BaseModel):
+    password_hash: str
 
-class UserDB(BaseModel):
+class UserDB(UserUpdatePasswordBdSchema):
     phone: str
     name: str
-    password_hash: str
     role: UserRoleEnum
 
 
@@ -50,3 +51,8 @@ class UserRequestUpdateSchema(BaseModel):
 
 class UserUpdateSchema(UserRequestUpdateSchema):
     last_update : datetime
+
+class UserPasswordUpdateSchema(BaseModel):
+    now_password : str 
+    new_password : str
+    again_new_password : str

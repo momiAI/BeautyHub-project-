@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Body, HTTPException, Response, Cookie
 
 from src.route.dependency import DbDep, MeDep
-from src.schemas.users import UserCreate, UserLogin,UserRequestUpdateSchema
+from src.schemas.users import UserCreate, UserLogin,UserRequestUpdateSchema,UserPasswordUpdateSchema
 from src.service.users import UsersService
 from src.utils.exceptions import (
     IncorectName,
+    IncorectNowPassword,
     IncorectPhone,
+    PasswordDuplicate,
+    PasswordNotMatch,
     UserUniqueError,
     UserNoFound,
     IncorectData,
@@ -45,6 +48,26 @@ async def user_update(db : DbDep, user : MeDep, data : UserRequestUpdateSchema =
         raise HTTPException(status_code=409, detail='Пользователь с таким номером уже существует, если вы хотите перенести историю посещений на аккаунт пожалуйста обратитесь к администратору.')
     except UserUpdateCooldownError as exc:
         raise HTTPException(status_code=429, detail=exc.detail)
+
+@router.patch('/update-password', summary='Обновление пароля')
+async def user_password_update(db : DbDep, user : MeDep, data : UserPasswordUpdateSchema = Body(openapi_examples={"1" : {
+    "summary" : "Обновление пароля",
+    "value" : {
+        "now_password" : "abcde",
+        "new_password" : "abcde1",
+        "again_new_password" : "abcde1"
+    }
+}}) ):
+    try:
+        await UsersService(db).update_password(user.user_id,data)
+        await db.commit()
+        return {'message' : 'OK'}
+    except PasswordNotMatch as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
+    except PasswordDuplicate as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
+    except IncorectNowPassword as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
 
 @router.post("/create", summary="Создание пользователя")
 async def user_create(

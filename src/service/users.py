@@ -1,6 +1,6 @@
 from src.models.enum import UserRoleEnum
 from src.service.base import BaseService
-from src.schemas.users import UserCreate, UserLogin,UserRoleUpdateSchema,UserUpdateSchema,UserRequestUpdateSchema
+from src.schemas.users import UserCreate, UserLogin, UserPasswordUpdateSchema,UserRoleUpdateSchema, UserUpdatePasswordBdSchema,UserUpdateSchema,UserRequestUpdateSchema
 from src.schemas.client import ClientUpdateUserSchema
 from src.utils.users_utils import user_utils
 from src.utils.date_utils import date_utils
@@ -8,6 +8,8 @@ from src.schemas.client import ClientDbSchema
 from src.service.client import ClientService
 from src.utils.exceptions import (
     IncorectName,
+    PasswordDuplicate,
+    PasswordNotMatch,
     UniqueError,
     UserUniqueError,
     IncorectPhone,
@@ -15,7 +17,8 @@ from src.utils.exceptions import (
     UserNoFound,
     IncorectData,
     IncorectToken,
-    UserUpdateCooldownError
+    UserUpdateCooldownError,
+    IncorectNowPassword
 )
 
 
@@ -50,6 +53,24 @@ class UsersService(BaseService):
             raise IncorectPhone
         except UserUpdateCooldownError: 
             raise UserUpdateCooldownError
+
+    async def update_password(self, id_user : int, data : UserPasswordUpdateSchema):
+        user = await self.db.user.get_object(id = id_user)
+        if user_utils.verify_password(data.now_password,user.password_hash):
+            hash_new_password = user_utils.hasheed_password(data.new_password)
+            if hash_new_password != user.password_hash: 
+                if data.new_password == data.again_new_password:
+                    return await self.db.user.update(id = user.id, 
+                                                     values=UserUpdatePasswordBdSchema(password_hash=user_utils.hasheed_password(data.new_password))
+                                                     )
+                else: 
+                    raise PasswordNotMatch
+            else:
+                raise PasswordDuplicate
+        else: 
+            raise IncorectNowPassword
+
+
 
     async def login_user(self, data: UserLogin):
         try:
