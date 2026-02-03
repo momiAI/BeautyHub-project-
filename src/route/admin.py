@@ -1,14 +1,14 @@
-from fastapi import APIRouter,Body, HTTPException
+from fastapi import APIRouter,Body, HTTPException,UploadFile,File,Form
 
 from src.route.dependency import AdminDep,DbDep
 from src.schemas.masters import MasterSpecializationCreateSchema
 from src.schemas.service import ServiceCreateSchemas
 from src.service.masters import MastersService
+from src.service.salon import SalonService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
 from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
-
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
 
@@ -81,3 +81,21 @@ async def create_administrator(db : DbDep, id_user : int, admin : AdminDep):
         return {"data" : result}
     except UserNoFound as exc:
         raise HTTPException(status_code=404,detail=exc.detail)
+    
+@router.post("/salon/create", summary='Добавить салон')
+async def salon_create(db : DbDep, 
+                       admin : AdminDep, 
+                       name : str = Form(),
+                       city : str = Form(),
+                       image : UploadFile = File()
+):
+    try:
+        result = await SalonService(db).salon_create(
+            name=name,
+            city=city,
+            image=image
+            )
+        #await db.commit()
+        return {"message" : result}
+    except:
+        pass

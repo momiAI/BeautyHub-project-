@@ -5,6 +5,7 @@ from src.models.service import ServiceModel,MasterServiceModel
 from src.models.users import UsersModel
 from src.models.master_specialization import MasterSpecializationModel
 from src.models.client import ClientModel,ClientRatingModel
+from src.models.salons import SalonModel
 
 __all__ = ["MasterModel", 
            "ReceptionModel", 
@@ -18,5 +19,6 @@ __all__ = ["MasterModel",
            "MasterRequestModel",
            "MasterRatingModel",
            "ClientModel",
-           "ClientRatingModel"
+           "ClientRatingModel",
+           "SalonModel"
            ]

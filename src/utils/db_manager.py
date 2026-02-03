@@ -10,7 +10,7 @@ from src.repository.master import (
 from src.repository.service import ServiceRepository,ServiceRelationMasterRepository
 from src.repository.reception import ReceptionRepository
 from src.repository.client import ClientRepository,ClientRatingRelationRepository
-
+from src.repository.salon import SalonRepository
 
 class DbManager:
     def __init__(self, session_factory):
@@ -34,6 +34,7 @@ class DbManager:
 
         self.service = ServiceRepository(self.session)
         self.service_relation = ServiceRelationMasterRepository(self.session)
+        self.salon = SalonRepository(self.session)
 
         self.reception = ReceptionRepository(self.session)
 
