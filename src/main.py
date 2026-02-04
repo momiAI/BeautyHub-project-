@@ -3,6 +3,7 @@ import sys
 from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 sys.path.append(str(Path(__file__).parent.parent))
 
@@ -13,6 +14,7 @@ from src.route.master_specialization import router as master_specialization_rout
 from src.route.admin import router as admin_router
 from src.route.reception import router as reception_router
 from src.route.client import router as client_router
+from src.route.salons import router as salon_router
 
 app = FastAPI()
 
@@ -27,6 +29,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.mount('/static', StaticFiles(directory='static'), name='static')
 
 app.include_router(user_router)
 app.include_router(masters_router)
@@ -35,7 +38,7 @@ app.include_router(master_specialization_router)
 app.include_router(admin_router)
 app.include_router(reception_router)
 app.include_router(client_router)
-
+app.include_router(salon_router)
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

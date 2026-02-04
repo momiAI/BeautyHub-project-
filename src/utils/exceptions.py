@@ -8,6 +8,12 @@ class CustomException(Exception):
 class IncorectData(CustomException):
     detail = "Неверные данные"
 
+class IncorectTypeFile(IncorectData):
+    detail = "Неверный формат файла"
+
+class IncorectTypeImage(IncorectTypeFile):
+    detail = "Данный формат изображения не поддерживается."
+
 class IncorectDate(IncorectData):
     detail = "Неверная дата"
 

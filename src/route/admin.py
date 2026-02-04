@@ -8,7 +8,8 @@ from src.service.salon import SalonService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, IncorectTypeImage, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
 
@@ -86,16 +87,18 @@ async def create_administrator(db : DbDep, id_user : int, admin : AdminDep):
 async def salon_create(db : DbDep, 
                        admin : AdminDep, 
                        name : str = Form(),
-                       city : str = Form(),
+                       address : str = Form(),
+                       city : CityEnum = Form(),
                        image : UploadFile = File()
 ):
     try:
         result = await SalonService(db).salon_create(
             name=name,
-            city=city,
-            image=image
+            city=city.value,
+            image=image,
+            address=address
             )
-        #await db.commit()
+        await db.commit()
         return {"message" : result}
-    except:
-        pass
+    except IncorectTypeImage as exc:
+        raise HTTPException(status_code=415, detail=exc.detail)

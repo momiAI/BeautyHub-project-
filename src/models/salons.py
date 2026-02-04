@@ -11,4 +11,5 @@ class SalonModel(Base):
     id : Mapped[int] = mapped_column(Integer, primary_key=True)
     name : Mapped[str] = mapped_column(String(50))
     city : Mapped[str] = mapped_column(String(30))
-    image_url : Mapped[str]
+    address : Mapped[str] = mapped_column(String(100)) 
+    image_url : Mapped[str | None]

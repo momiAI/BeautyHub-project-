@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from typing import Literal
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -18,6 +20,12 @@ class Settings(BaseSettings):
 
     ADMIN_PHONE: str
     ADMIN_PASSWORD: str
+
+    BASE_IDR : Path = Path(__file__).parent.parent
+    FACE_IMAGE_DIR : Path = BASE_IDR / 'static' / 'face_images'
+    FACE_IMAGE_DIR_BD : str = '/static/face_images/'
+    
+    IMAGE_FORMAT : list = ['png', 'jpg', 'jpeg']
 
     @property
     def db_url(self):
