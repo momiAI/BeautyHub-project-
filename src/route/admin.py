@@ -102,3 +102,24 @@ async def salon_create(db : DbDep,
         return {"message" : result}
     except IncorectTypeImage as exc:
         raise HTTPException(status_code=415, detail=exc.detail)
+
+@router.patch(path='/update', summary='Обновление данных о салоне')
+async def update_salons(db : DbDep,
+                        admin : AdminDep,
+                        id_salon : int,
+                        name : str | None = Form(None),
+                        address : str | None = Form(None),
+                        city : CityEnum | None = Form(None),
+                        image : UploadFile | None = File(None),
+                        portfolio_image : list[UploadFile] | None = File(None)              
+):
+    result = await SalonService(db).salon_update(
+        id_salon=id_salon,
+        name=name,
+        address=address,
+        city=city,
+        image=image,
+        portfolio_image=portfolio_image     
+    )
+    #await db.commit()
+    return {'message' : result}

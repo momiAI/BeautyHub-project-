@@ -24,6 +24,8 @@ class Settings(BaseSettings):
     BASE_IDR : Path = Path(__file__).parent.parent
     FACE_IMAGE_DIR : Path = BASE_IDR / 'static' / 'face_images'
     FACE_IMAGE_DIR_BD : str = '/static/face_images/'
+    PORTFOLIO_IMAGE_DIR : Path = BASE_IDR / 'static' / 'portfolio_images'
+    PORTFOLIO_IMAGE_DIR_BD : str = '/static/portfolio_images/'
     
     IMAGE_FORMAT : list = ['png', 'jpg', 'jpeg']
 

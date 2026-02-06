@@ -1,6 +1,6 @@
 from src.service.base import BaseService
 from src.schemas.salons import SalonAddSchema,SalonUpdateSchema
-from src.utils.exceptions import IncorectTypeFile,IncorectTypeImage
+from src.utils.exceptions import IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound
 from src.utils.file_utils import files_utils
 
 
@@ -21,3 +21,27 @@ class SalonService(BaseService):
             return await self.db.salon.update(salon.id,data_update_path)
         except IncorectTypeFile:
             raise IncorectTypeImage
+        
+    async def salon_update(self,id_salon : int, name : str, address : str,city : str, image, portfolio_image : list):
+        try:
+            salon = await self.db.salon.get_object(id = id_salon)
+            if image:
+                if salon.image_url is None:
+                    image_path_for_db = files_utils.save_face_image(image=image,city=salon.city,id_salon=salon.id)
+                    salon = await self.db.salon.update(salon.id,SalonUpdateSchema(image_url = image_path_for_db))
+                else:
+                    files_utils.update_face_image(salon.image_url, image)
+            elif portfolio_image:
+                if salon.portfolio_url is None:
+                    list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
+                    salon = await self.db.salon.update(salon.id,SalonUpdateSchema(portfolio_url = list_images_path_for_db))
+            data_update = SalonUpdateSchema.model_validate(id_salon=id_salon,
+                                                           name=name,
+                                                           address=address,
+                                                           city=city,
+                                                            )
+            return await self.db.salon.update(salon.id, data_update)
+        except NoFound:
+            raise SalonNoFound
+        except IncorectTypeFile:
+            raise IncorectTypeFile
