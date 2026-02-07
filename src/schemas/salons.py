@@ -6,7 +6,7 @@ class SalonAddSchema(BaseModel):
     city : str
     address : str
     image_url : str | None = None
-    portfolio_url : str | None = None
+    portfolio_url : list[str] | None = None
 
 class SalonSchema(SalonAddSchema):
     id : int

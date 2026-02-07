@@ -110,8 +110,9 @@ async def update_salons(db : DbDep,
                         name : str | None = Form(None),
                         address : str | None = Form(None),
                         city : CityEnum | None = Form(None),
+                        delete_portfolio_images : list[str] | None = Form(None),  
                         image : UploadFile | None = File(None),
-                        portfolio_image : list[UploadFile] | None = File(None)              
+                        portfolio_image : list[UploadFile] | None = File(None)            
 ):
     result = await SalonService(db).salon_update(
         id_salon=id_salon,
@@ -119,7 +120,8 @@ async def update_salons(db : DbDep,
         address=address,
         city=city,
         image=image,
-        portfolio_image=portfolio_image     
+        portfolio_image=portfolio_image,
+        delete_portfolio_images=delete_portfolio_images     
     )
     #await db.commit()
     return {'message' : result}

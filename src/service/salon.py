@@ -22,7 +22,16 @@ class SalonService(BaseService):
         except IncorectTypeFile:
             raise IncorectTypeImage
         
-    async def salon_update(self,id_salon : int, name : str, address : str,city : str, image, portfolio_image : list):
+    async def salon_update(
+                        self,
+                        id_salon : int, 
+                        name : str, 
+                        address : str,
+                        city : str, 
+                        image, 
+                        portfolio_image : list,
+                        delete_portfolio_images : list[str]
+                        ):
         try:
             salon = await self.db.salon.get_object(id = id_salon)
             if image:
@@ -35,12 +44,13 @@ class SalonService(BaseService):
                 if salon.portfolio_url is None:
                     list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
                     salon = await self.db.salon.update(salon.id,SalonUpdateSchema(portfolio_url = list_images_path_for_db))
-            data_update = SalonUpdateSchema.model_validate(id_salon=id_salon,
-                                                           name=name,
-                                                           address=address,
-                                                           city=city,
-                                                            )
-            return await self.db.salon.update(salon.id, data_update)
+                else:
+                    
+            if name or address or city:
+                data_update = SalonUpdateSchema(name=name,address=address,city=city)
+                return await self.db.salon.update(id=salon.id, values=data_update)
+            else:
+                return 'Строковые наименования не обновлены'
         except NoFound:
             raise SalonNoFound
         except IncorectTypeFile:
