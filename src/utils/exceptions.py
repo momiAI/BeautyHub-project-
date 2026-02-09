@@ -53,6 +53,9 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
+class DirNoFound(CustomException):
+    detail = "Директория не найдена"
+
 class SalonNoFound(NoFound):
     detail = "Салон не найден"
 

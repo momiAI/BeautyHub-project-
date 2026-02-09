@@ -22,7 +22,7 @@ class SalonService(BaseService):
         except IncorectTypeFile:
             raise IncorectTypeImage
         
-    async def salon_update(
+    async def salon_update_(
                         self,
                         id_salon : int, 
                         name : str, 
@@ -44,7 +44,7 @@ class SalonService(BaseService):
                 if salon.portfolio_url is None:
                     list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
                     salon = await self.db.salon.update(salon.id,SalonUpdateSchema(portfolio_url = list_images_path_for_db))
-                else:
+            
                     
             if name or address or city:
                 data_update = SalonUpdateSchema(name=name,address=address,city=city)

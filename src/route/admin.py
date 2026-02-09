@@ -8,7 +8,7 @@ from src.service.salon import SalonService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, IncorectTypeImage, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -114,14 +114,17 @@ async def update_salons(db : DbDep,
                         image : UploadFile | None = File(None),
                         portfolio_image : list[UploadFile] | None = File(None)            
 ):
-    result = await SalonService(db).salon_update(
-        id_salon=id_salon,
-        name=name,
-        address=address,
-        city=city,
-        image=image,
-        portfolio_image=portfolio_image,
-        delete_portfolio_images=delete_portfolio_images     
-    )
-    #await db.commit()
-    return {'message' : result}
+    try:
+        result = await SalonService(db).salon_update(
+            id_salon=id_salon,
+            name=name,
+            address=address,
+            city=city,
+            image=image,
+            portfolio_image=portfolio_image,
+            delete_portfolio_images=delete_portfolio_images     
+        )
+        await db.commit()
+        return {'message' : result}
+    except SalonNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
