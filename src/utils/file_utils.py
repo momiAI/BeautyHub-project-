@@ -4,7 +4,7 @@ from fastapi import UploadFile
 
 
 from src.config import settings
-from src.utils.exceptions import IncorectTypeFile,TooManyFiles,DirNoFound
+from src.utils.exceptions import IncorectTypeFile,TooManyFiles,DirNoFound,ImageInDbNoFound,ImageInDirNoFound
 
 class FilesUtils:
 
@@ -12,7 +12,10 @@ class FilesUtils:
         name_dir = f'{id_salon}_{city}'
         images_dir = settings.PORTFOLIO_IMAGE_DIR / name_dir
         images_in_dir = list(images_dir.iterdir())
-        return max([int(image.name.split('_')[0]) for image in images_in_dir])
+        list_count = [int(image.name.split('_')[0]) for image in images_in_dir]
+        if list_count == []:
+            return 0
+        return max(list_count)
 
 
     def delete_portfolio_images(self, id_salon : int, city : str, list_images : list[str]):
@@ -23,6 +26,8 @@ class FilesUtils:
             raise DirNoFound
         images_in_dir = list(images_dir.iterdir())
         images_for_delete = [image_delete.split('/')[-1] for image_delete in list_images]
+        if images_for_delete not in images_in_dir:
+            raise ImageInDirNoFound
         for image in images_in_dir:
             image_path = images_dir / image.name
             if image_path.exists() and image_path.is_file() and image.name in images_for_delete:
@@ -59,19 +64,19 @@ class FilesUtils:
         if len(list_images_in_db) + len(add_list_images) - len(delete_portfolio_images) > 10:
             raise TooManyFiles
         if delete_portfolio_images:
+            if delete_portfolio_images not in list_images_in_db:
+                raise ImageInDbNoFound
             delete_list_images_to_db = self.delete_portfolio_images(id_salon,city,delete_portfolio_images)
-        elif add_list_images:
+        else:
+            delete_list_images_to_db = []
+        if add_list_images:
             max_count = self.max_count_images(id_salon,city)
             add_list_images_to_db = self.save_portfolio_images(add_list_images,city,id_salon,max_count)
         else:
-            return 'Фотографии портфолио не получены'
+            add_list_images_to_db = []
         
         return add_list_images_to_db,delete_list_images_to_db
         
-
-    
-   
-    #4. Сохранить файлы и добавит в переменные которые вернуться.
 
     def save_face_image(self, image : UploadFile, city : str, id_salon : int):
         format_image = image.filename.split('.')[-1]

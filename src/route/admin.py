@@ -124,7 +124,7 @@ async def update_salons(db : DbDep,
             portfolio_image=portfolio_image,
             delete_portfolio_images=delete_portfolio_images     
         )
-        await db.commit()
+        #await db.commit()
         return {'message' : result}
     except SalonNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)

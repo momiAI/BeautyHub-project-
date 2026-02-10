@@ -53,7 +53,13 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
-class DirNoFound(CustomException):
+class ImageInDirNoFound(NoFound):
+    detail = "Изображение в папке не найдено"
+
+class ImageInDbNoFound(NoFound):
+    detail = "Изображение в базе данных не найдено."
+
+class DirNoFound(NoFound):
     detail = "Директория не найдена"
 
 class SalonNoFound(NoFound):

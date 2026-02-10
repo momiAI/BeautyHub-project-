@@ -1,6 +1,6 @@
 from src.service.base import BaseService
 from src.schemas.salons import SalonAddSchema,SalonUpdateSchema
-from src.utils.exceptions import IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound
+from src.utils.exceptions import ImageInDbNoFound, IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound
 from src.utils.file_utils import files_utils
 
 
@@ -22,36 +22,62 @@ class SalonService(BaseService):
         except IncorectTypeFile:
             raise IncorectTypeImage
         
-    async def salon_update_(
+    async def salon_update(
                         self,
                         id_salon : int, 
-                        name : str, 
-                        address : str,
-                        city : str, 
                         image, 
-                        portfolio_image : list,
-                        delete_portfolio_images : list[str]
+                        name : str | None = None, 
+                        address : str | None = None,
+                        city : str | None = None, 
+                        portfolio_image : list | None = None,
+                        delete_portfolio_images : list[str] | None = None
                         ):
         try:
+            portfolio_image = portfolio_image or []
+            delete_portfolio_images = delete_portfolio_images or []
+            update_data = {}
             salon = await self.db.salon.get_object(id = id_salon)
             if image:
                 if salon.image_url is None:
                     image_path_for_db = files_utils.save_face_image(image=image,city=salon.city,id_salon=salon.id)
-                    salon = await self.db.salon.update(salon.id,SalonUpdateSchema(image_url = image_path_for_db))
+                    update_data['image_url'] = image_path_for_db
                 else:
                     files_utils.update_face_image(salon.image_url, image)
-            elif portfolio_image:
+            if portfolio_image:
                 if salon.portfolio_url is None:
                     list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
-                    salon = await self.db.salon.update(salon.id,SalonUpdateSchema(portfolio_url = list_images_path_for_db))
-            
+                    update_data['portfolio_url'] = list_images_path_for_db
+                else:
+                    add_list_images_to_db,delete_list_images_to_db = files_utils.update_portfolio_images(id_salon=salon.id,
+                                                                                                         city=salon.city,
+                                                                                                         list_images_in_db=salon.portfolio_url,
+                                                                                                         add_list_images=portfolio_image,
+                                                                                                         delete_portfolio_images=delete_portfolio_images
+                                                                                                         )
+                    if delete_list_images_to_db:
+                        update_list_delete_to_db = [
+                            image for image in salon.portfolio_url
+                            if image in delete_list_images_to_db
+                        ]
+                        update_data['portfolio_url'] = update_list_delete_to_db
+                    if add_list_images_to_db:
+                        update_list_add_to_db = salon.portfolio_url + add_list_images_to_db
+                        if 'portfolio_url' in update_data:
+                            update_list_add_to_db += update_data['portfolio_url']
+                        update_data['portfolio_url'] = update_list_add_to_db
                     
-            if name or address or city:
-                data_update = SalonUpdateSchema(name=name,address=address,city=city)
-                return await self.db.salon.update(id=salon.id, values=data_update)
-            else:
-                return 'Строковые наименования не обновлены'
+            if name:
+                update_data['name'] = name
+            if address:
+                update_data['address'] = address
+            if city:
+                update_data['city'] = city
+
+            return await self.db.salon.update(salon.id,SalonUpdateSchema(**update_data))
+            '''Дотестировать ручку '''
         except NoFound:
             raise SalonNoFound
         except IncorectTypeFile:
             raise IncorectTypeFile
+        except ImageInDbNoFound:
+            raise ImageInDbNoFound
