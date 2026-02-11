@@ -1,6 +1,6 @@
 from src.service.base import BaseService
 from src.schemas.salons import SalonAddSchema,SalonUpdateSchema
-from src.utils.exceptions import ImageInDbNoFound, IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound
+from src.utils.exceptions import ImageInDbNoFound, IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound,ImageInDirNoFound
 from src.utils.file_utils import files_utils
 
 
@@ -48,24 +48,13 @@ class SalonService(BaseService):
                     list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
                     update_data['portfolio_url'] = list_images_path_for_db
                 else:
-                    add_list_images_to_db,delete_list_images_to_db = files_utils.update_portfolio_images(id_salon=salon.id,
+                    add_list_images_to_db = files_utils.update_portfolio_images(id_salon=salon.id,
                                                                                                          city=salon.city,
                                                                                                          list_images_in_db=salon.portfolio_url,
                                                                                                          add_list_images=portfolio_image,
                                                                                                          delete_portfolio_images=delete_portfolio_images
                                                                                                          )
-                    if delete_list_images_to_db:
-                        update_list_delete_to_db = [
-                            image for image in salon.portfolio_url
-                            if image in delete_list_images_to_db
-                        ]
-                        update_data['portfolio_url'] = update_list_delete_to_db
-                    if add_list_images_to_db:
-                        update_list_add_to_db = salon.portfolio_url + add_list_images_to_db
-                        if 'portfolio_url' in update_data:
-                            update_list_add_to_db += update_data['portfolio_url']
-                        update_data['portfolio_url'] = update_list_add_to_db
-                    
+                    update_data['portfolio_url'] = add_list_images_to_db
             if name:
                 update_data['name'] = name
             if address:
@@ -74,10 +63,13 @@ class SalonService(BaseService):
                 update_data['city'] = city
 
             return await self.db.salon.update(salon.id,SalonUpdateSchema(**update_data))
-            '''Дотестировать ручку '''
-        except NoFound:
-            raise SalonNoFound
+        # 1. Оптимизировать сервис 
+        # 2. Провести больше тестов
         except IncorectTypeFile:
             raise IncorectTypeFile
         except ImageInDbNoFound:
             raise ImageInDbNoFound
+        except ImageInDirNoFound:
+            raise ImageInDirNoFound
+        except NoFound:
+            raise SalonNoFound

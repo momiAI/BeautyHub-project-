@@ -12,10 +12,9 @@ class FilesUtils:
         name_dir = f'{id_salon}_{city}'
         images_dir = settings.PORTFOLIO_IMAGE_DIR / name_dir
         images_in_dir = list(images_dir.iterdir())
-        list_count = [int(image.name.split('_')[0]) for image in images_in_dir]
-        if list_count == []:
-            return 0
-        return max(list_count)
+        list_count = sorted([int(image.name.split('_')[0]) for image in images_in_dir])
+        free_count = sorted([free for free in range(10) if free not in list_count])
+        return free_count
 
 
     def delete_portfolio_images(self, id_salon : int, city : str, list_images : list[str]):
@@ -24,36 +23,37 @@ class FilesUtils:
         images_dir = settings.PORTFOLIO_IMAGE_DIR / name_dir
         if not os.path.exists(images_dir):
             raise DirNoFound
-        images_in_dir = list(images_dir.iterdir())
+        images_in_dir = [image.name for image in images_dir.iterdir() if image.is_file()]
         images_for_delete = [image_delete.split('/')[-1] for image_delete in list_images]
-        if images_for_delete not in images_in_dir:
-            raise ImageInDirNoFound
+        for image_name  in images_for_delete:
+            if image_name not in images_in_dir:
+                raise ImageInDirNoFound
         for image in images_in_dir:
-            image_path = images_dir / image.name
-            if image_path.exists() and image_path.is_file() and image.name in images_for_delete:
-                deleted_path_images.append(f'{settings.PORTFOLIO_IMAGE_DIR_BD}{name_dir}/{image.name}')
+            image_path = images_dir / image
+            if image_path.exists() and image_path.is_file() and image in images_for_delete:
+                deleted_path_images.append(f'{settings.PORTFOLIO_IMAGE_DIR_BD}{name_dir}/{image}')
                 image_path.unlink()
         return deleted_path_images
                 
 
-    def save_portfolio_images(self, list_images : list[UploadFile], city : str, id_salon : int, number : int | None = None):
-        list_images_path_for_db = []
-        count = 0 or number
+    def save_portfolio_images(self, list_images : list[UploadFile], city : str, id_salon : int):
+        count = 0
+        list_count = self.max_count_images(id_salon,city)
+        name_dir = f'{id_salon}_{city}'
+        image_path_dir = settings.PORTFOLIO_IMAGE_DIR / name_dir
         for image in list_images:
             if image.filename.split('.')[-1] not in settings.IMAGE_FORMAT:
                 raise IncorectTypeFile
             
         for image in list_images:
-            name_image = f"{count}_{id_salon}_{city}.{image.filename.split('.')[-1]}"
-            name_dir = f'{id_salon}_{city}'
-            image_path_dir = settings.PORTFOLIO_IMAGE_DIR / name_dir
+            name_image = f"{list_count[count]}_{id_salon}_{city}.{image.filename.split('.')[-1]}"
             image_path = image_path_dir / name_image
             image_path_dir.mkdir(parents=True,exist_ok=True)
             with open(image_path,'wb') as buffer:
                 shutil.copyfileobj(image.file,buffer)
-            list_images_path_for_db.append(f'{settings.PORTFOLIO_IMAGE_DIR_BD}{name_dir}/{name_image}')
             count += 1
-
+        images_in_dir = list(image_path_dir.iterdir())
+        list_images_path_for_db = [f'{settings.PORTFOLIO_IMAGE_DIR_BD}{name_dir}/{name.name}' for name in images_in_dir]
         return list_images_path_for_db
     
     def update_portfolio_images(self,id_salon : int, city : str, 
@@ -64,18 +64,16 @@ class FilesUtils:
         if len(list_images_in_db) + len(add_list_images) - len(delete_portfolio_images) > 10:
             raise TooManyFiles
         if delete_portfolio_images:
-            if delete_portfolio_images not in list_images_in_db:
-                raise ImageInDbNoFound
-            delete_list_images_to_db = self.delete_portfolio_images(id_salon,city,delete_portfolio_images)
-        else:
-            delete_list_images_to_db = []
+            for images_url in delete_portfolio_images:
+                if images_url not in list_images_in_db:
+                    raise ImageInDbNoFound
+            self.delete_portfolio_images(id_salon,city,delete_portfolio_images)
         if add_list_images:
-            max_count = self.max_count_images(id_salon,city)
-            add_list_images_to_db = self.save_portfolio_images(add_list_images,city,id_salon,max_count)
+            add_list_images_to_db = self.save_portfolio_images(add_list_images,city,id_salon)
         else:
             add_list_images_to_db = []
-        
-        return add_list_images_to_db,delete_list_images_to_db
+
+        return add_list_images_to_db
         
 
     def save_face_image(self, image : UploadFile, city : str, id_salon : int):
