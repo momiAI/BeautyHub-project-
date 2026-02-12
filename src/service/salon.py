@@ -1,8 +1,7 @@
 from src.service.base import BaseService
 from src.schemas.salons import SalonAddSchema,SalonUpdateSchema
 from src.utils.exceptions import ImageInDbNoFound, IncorectTypeFile,IncorectTypeImage,SalonNoFound,NoFound,ImageInDirNoFound
-from src.utils.file_utils import files_utils
-
+from src.utils.file_utils import FilesUtils
 
 class SalonService(BaseService):
 
@@ -16,7 +15,8 @@ class SalonService(BaseService):
     async def salon_create(self, name : str, city : str, image, address : str):
         try:
             salon = await self.db.salon.create(SalonAddSchema(name=name,city=city,address=address))
-            image_path_for_db = files_utils.save_face_image(image=image,city=city, id_salon=salon.id)
+            files_utils = FilesUtils(salon.id,salon.city)
+            image_path_for_db = files_utils.save_face_image(image=image)
             data_update_path = SalonUpdateSchema(image_url=image_path_for_db)
             return await self.db.salon.update(salon.id,data_update_path)
         except IncorectTypeFile:
@@ -37,23 +37,24 @@ class SalonService(BaseService):
             delete_portfolio_images = delete_portfolio_images or []
             update_data = {}
             salon = await self.db.salon.get_object(id = id_salon)
+            files_utils = FilesUtils(salon.id,salon.city)
             if image:
                 if salon.image_url is None:
-                    image_path_for_db = files_utils.save_face_image(image=image,city=salon.city,id_salon=salon.id)
+                    image_path_for_db = files_utils.save_face_image(image=image)
                     update_data['image_url'] = image_path_for_db
                 else:
                     files_utils.update_face_image(salon.image_url, image)
+            if delete_portfolio_images:
+                update_data['portfolio_url'] = files_utils.delete_portfolio_images(delete_portfolio_images,salon.portfolio_url)
             if portfolio_image:
                 if salon.portfolio_url is None:
-                    list_images_path_for_db = files_utils.save_portfolio_images(list_images = portfolio_image, city = salon.city, id_salon = salon.id)
-                    update_data['portfolio_url'] = list_images_path_for_db
+                    update_data['portfolio_url'] = files_utils.save_portfolio_images(list_images = portfolio_image)
                 else:
-                    add_list_images_to_db = files_utils.update_portfolio_images(id_salon=salon.id,
-                                                                                                         city=salon.city,
-                                                                                                         list_images_in_db=salon.portfolio_url,
-                                                                                                         add_list_images=portfolio_image,
-                                                                                                         delete_portfolio_images=delete_portfolio_images
-                                                                                                         )
+                    add_list_images_to_db = files_utils.update_portfolio_images(
+                                                                                id_salon=salon.id,
+                                                                                list_images_in_db=salon.portfolio_url,
+                                                                                add_list_images=portfolio_image,
+                                                                            )
                     update_data['portfolio_url'] = add_list_images_to_db
             if name:
                 update_data['name'] = name
@@ -61,10 +62,8 @@ class SalonService(BaseService):
                 update_data['address'] = address
             if city:
                 update_data['city'] = city
-
             return await self.db.salon.update(salon.id,SalonUpdateSchema(**update_data))
-        # 1. Оптимизировать сервис 
-        # 2. Провести больше тестов
+
         except IncorectTypeFile:
             raise IncorectTypeFile
         except ImageInDbNoFound:
