@@ -4,6 +4,15 @@ from src.utils.exceptions import ImageInDbNoFound, IncorectTypeFile,IncorectType
 from src.utils.file_utils import FilesUtils
 
 class SalonService(BaseService):
+    
+
+
+    async def get_salon_by_id(self,id_salon : int):
+        try:
+            return await self.db.salon.get_object(id = id_salon)
+        except NoFound:
+            raise SalonNoFound
+
 
     async def get_salons(self,city : str | None):
         if city: 

@@ -8,7 +8,7 @@ from src.service.salon import SalonService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -127,4 +127,10 @@ async def update_salons(db : DbDep,
         await db.commit()
         return {'message' : result}
     except SalonNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
+    except IncorectTypeFile as exc:
+        raise HTTPException(status_code=400, detail=exc.detail)
+    except ImageInDbNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
+    except ImageInDirNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
