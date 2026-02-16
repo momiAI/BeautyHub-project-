@@ -9,8 +9,10 @@ from src.schemas.masters import (
 )
 from src.schemas.dayoff import DayOffCreateSchema
 from src.schemas.workday import WorkDayDbSchema,WorkDayRequstSchema
+from src.schemas.salons import SalonToMasterSchema
 from src.utils.masters_utils import master_utils
 from src.utils.exceptions import (
+    ForeignKeyNoFound,
     MasterRequestAlreadyInProgressError,
     MasterRequestCooldownError,
     MasterRequestUniqueError,
@@ -21,7 +23,8 @@ from src.utils.exceptions import (
     ApplicationApproved,
     IdSpecializationNoFound,
     IncorectDate,
-    IncorectData
+    IncorectData,
+    SalonNoFound
 )
 from src.models.enum import UserRoleEnum, MasterRequestStatusEnum
 
@@ -59,6 +62,7 @@ class MastersService(BaseService):
         try:
             application = await self.db.master_request.get_object(id_user=id_user)
             if application:
+                #добавить проверку на наличие салона !
                 obj = master_utils.check_application(application)
                 return await self.db.master_request.update(
                     id=obj.id, values=data_update
@@ -85,13 +89,19 @@ class MastersService(BaseService):
             await self.db.master_request.update(id, MasterRequestConfirmSchema())
             await self.db.user.update(id = application.id_user,values =  UserRoleUpdateSchema(role =UserRoleEnum.MASTER))
             master =  await self.db.master.create(application)
+            await self.db.salon_master.create_bulk([
+                SalonToMasterSchema(id_master=master.id, id_salon=id_salon)
+                for id_salon in master_request.id_salons
+            ])
             await self.db.master_specialization_relation.create_bulk(
-                [
+                [ 
                     SpecializationMasterRelationSchema(master_id= master.id,masterspecialization_id=i)
                     for i in master_request.specializations
                 ]
             )
             return master
+        except ForeignKeyNoFound:
+            raise SalonNoFound
         except NoFound:
             raise ApplicationNoFound
 

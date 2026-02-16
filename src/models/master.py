@@ -20,7 +20,6 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 from src.database import Base
 from src.models.enum import WeekDayEnum, MasterRequestStatusEnum
 
-
 class MasterModel(Base):
     __tablename__ = "master"
 
@@ -38,6 +37,11 @@ class MasterModel(Base):
     )
     day_offs: Mapped[list["DayOffModel"]] = relationship(
         back_populates="master", cascade="all, delete-orphan"
+    )
+
+    salons : Mapped[list["SalonModel"]] = relationship( # noqa: F821 # type: ignore
+        secondary='master_salon',
+        back_populates='masters'
     )
 
     rating : Mapped[float] = mapped_column(Float, default=0.0) 
@@ -94,6 +98,7 @@ class MasterRequestModel(Base):
     id_user: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True
     )
+    id_salons : Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     bio_short: Mapped[str] = mapped_column(String(50))
     specializations: Mapped[list[int]] = mapped_column(ARRAY(Integer), nullable=False)
     portfolio: Mapped[list[str]] = mapped_column(ARRAY(String), nullable=True)

@@ -17,3 +17,8 @@ class SalonUpdateSchema(BaseModel):
     image_url : str | None = None
     address : str | None = None
     portfolio_url : list[str] | None = None
+
+
+class SalonToMasterSchema(BaseModel):
+    id_master : int
+    id_salon : int    

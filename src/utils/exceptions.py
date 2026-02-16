@@ -53,6 +53,9 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
+class ForeignKeyNoFound(NoFound):
+    detail = 'Внешний ключ не найден' 
+
 class ImageInDirNoFound(NoFound):
     detail = "Изображение в папке не найдено"
 

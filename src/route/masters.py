@@ -47,6 +47,7 @@ async def application(
                         106
                     ],
                     "portfolio": ["Возможная ссылка", "Другая ссылка"],
+                    "id_salons" : [1,2]
                 },
             }
         }

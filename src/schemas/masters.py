@@ -5,6 +5,7 @@ from src.models.enum import MasterRequestStatusEnum
 from src.schemas.users import UserDepSchema
 from src.schemas.dayoff import DayOffCreateSchema
 from src.schemas.workday import WorkDaySchema,WorkDayRequstSchema
+from src.schemas.salons import SalonToMasterSchema
 
 
 class MasterSchema(BaseModel):
@@ -20,6 +21,7 @@ class MasterDetailSchema(MasterSchema):
     specialization: list[MasterSpecializationCreateSchema] | None = None
     work_days: list[WorkDaySchema] | None = None
     day_offs: list[DayOffCreateSchema] | None =None
+    salons : list[SalonToMasterSchema] | None = None
 
 class MasterBioUpdateSchema(BaseModel):
     bio : str
@@ -40,7 +42,7 @@ class MasterCreateRequestSchema(BaseModel):
     bio_short: str
     specializations: list[int]
     portfolio: list[str]
-
+    id_salons : list[int]
 
 class MasterConvertRequestSchema(MasterCreateRequestSchema):
     id_user: int
