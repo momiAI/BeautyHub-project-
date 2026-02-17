@@ -24,6 +24,10 @@ class MasterRepository(BaseOrmRep):
     model = MasterModel
     schema = MasterSchema
 
+    async def get_masters_in_salon(self,id_salon):
+        # utils 
+        pass
+
     async def get_master_by_id(self,id : int):
         query = (select(self.model)
                  .where(self.model.id == id)

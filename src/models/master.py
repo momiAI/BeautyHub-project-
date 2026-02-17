@@ -19,6 +19,7 @@ from sqlalchemy.orm import mapped_column, Mapped, relationship
 
 from src.database import Base
 from src.models.enum import WeekDayEnum, MasterRequestStatusEnum
+from src.config import settings
 
 class MasterModel(Base):
     __tablename__ = "master"
@@ -28,6 +29,7 @@ class MasterModel(Base):
         Integer, ForeignKey("users.id",ondelete="CASCADE"), nullable=False
     )
     bio: Mapped[str] = mapped_column(Text())
+    face_image : Mapped[str] = mapped_column(String, default=settings.FACE_IMAGE_DEFAULT_DB, server_default=settings.FACE_IMAGE_DEFAULT_DB,nullable=False)
 
     specialization: Mapped[list["MasterSpecializationModel"]] = relationship( # noqa: F821 # type: ignore
         secondary="specialization_master", back_populates="master"

@@ -1,4 +1,10 @@
 from datetime import datetime, timezone,date
+from sqlalchemy import select 
+
+
+from src.models.master import MasterModel as m
+from src.models.salons import master_salon as ms
+
 
 from src.utils.exceptions import (
     MasterRequestCooldownError,
@@ -64,5 +70,7 @@ class MastersUtils:
 
     def all_ids_exist(self,ids_request: list[int], ids_base: list[int]) -> bool:
         return set(ids_request).issubset(ids_base)
-
+    
+    def query_for_masters_in_salon(self, id_salon : int):
+        return select(m.id).join(ms).where(ms.c.id_salon == id_salon)
 master_utils = MastersUtils()

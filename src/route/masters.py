@@ -15,12 +15,16 @@ from src.utils.exceptions import (
     RoleNotAllowedError,
     MasterNoFound,
     IdSpecializationNoFound,
-    IncorectDate
+    IncorectDate,
+    SalonNoFound
 )
 
 router = APIRouter(prefix="/master", tags=["Мастера"])
 
-
+@router.get(path="/salon/{id_salon}", summary='Мастера определённого салона')
+async def salon_masters(db : DbDep, id_salon : int):
+    result = await MastersService(db).masters_in_salon(id_salon)
+    return {'data' : result}
 
 @router.get(path="/me",summary="Получение мастера")
 async def me(db : DbDep, master : MasterDep):
@@ -72,6 +76,8 @@ async def application(
             status_code=403, detail="Только пользователь может создать заявку."
         )
     except IdSpecializationNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
+    except SalonNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
 
 

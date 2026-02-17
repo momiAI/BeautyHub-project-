@@ -11,6 +11,8 @@ from src.schemas.salons import SalonToMasterSchema
 class MasterSchema(BaseModel):
     id: int
     id_user: int
+    rating : int
+    face_image : str
     bio: str
 
 class MasterSpecializationCreateSchema(BaseModel):

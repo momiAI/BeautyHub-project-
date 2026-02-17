@@ -34,6 +34,10 @@ class MastersService(BaseService):
     async def get_me(self,id : int):
         return await self.db.master.get_master_by_id(id = id)
 
+    async def masters_in_salon(self, id_salon : int):
+        return await self.db.salon.masters_in_salon(id_salon=id_salon)
+
+
     async def add_day_off(self, id : int, data : DayOffCreateSchema ):
         try:
             data_update = master_utils.converts_and_check_date_day_off(id,data)
@@ -55,6 +59,9 @@ class MastersService(BaseService):
         except NoFound:
             raise IdSpecializationNoFound
         
+        salons = [await self.db.salon.get_object_or_none(id = id_salon) for id_salon in data.id_salons]
+        if None in salons:
+            raise SalonNoFound
         
         data_update = master_utils.converts_request_data(id_user, data)
         
@@ -62,7 +69,6 @@ class MastersService(BaseService):
         try:
             application = await self.db.master_request.get_object(id_user=id_user)
             if application:
-                #добавить проверку на наличие салона !
                 obj = master_utils.check_application(application)
                 return await self.db.master_request.update(
                     id=obj.id, values=data_update

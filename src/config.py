@@ -26,6 +26,10 @@ class Settings(BaseSettings):
     FACE_IMAGE_DIR_BD : str = '/static/face_images/'
     PORTFOLIO_IMAGE_DIR : Path = BASE_IDR / 'static' / 'portfolio_images'
     PORTFOLIO_IMAGE_DIR_BD : str = '/static/portfolio_images/'
+
+    FACE_IMAGE_MASTER_DIR : Path = BASE_IDR / 'static' / 'masters' / 'front_images' 
+    FACE_IMAGE_MASTER_DEFAULT : Path = FACE_IMAGE_MASTER_DIR / 'no_image.png'
+    FACE_IMAGE_DEFAULT_DB : str = 'static/masters/front_images/no_image.png'
     
     IMAGE_FORMAT : list = ['png', 'jpg', 'jpeg']
 
