@@ -15,6 +15,10 @@ class MasterSchema(BaseModel):
     face_image : str
     bio: str
 
+class MasterWithNameSchema(BaseModel):
+    master : MasterSchema
+    name : str
+
 class MasterSpecializationCreateSchema(BaseModel):
     name : str
 

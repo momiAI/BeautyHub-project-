@@ -16,14 +16,18 @@ from src.utils.exceptions import (
     MasterNoFound,
     IdSpecializationNoFound,
     IncorectDate,
-    SalonNoFound
+    SalonNoFound,
+    MasterInSalonNoFound
 )
 
 router = APIRouter(prefix="/master", tags=["Мастера"])
 
 @router.get(path="/salon/{id_salon}", summary='Мастера определённого салона')
 async def salon_masters(db : DbDep, id_salon : int):
-    result = await MastersService(db).masters_in_salon(id_salon)
+    try:
+        result = await MastersService(db).masters_in_salon(id_salon)
+    except MasterInSalonNoFound as exc:
+        raise HTTPException(status_code=404, detail=exc.detail)
     return {'data' : result}
 
 @router.get(path="/me",summary="Получение мастера")

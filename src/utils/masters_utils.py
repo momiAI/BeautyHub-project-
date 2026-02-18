@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from src.models.master import MasterModel as m
 from src.models.salons import master_salon as ms
+from src.models.users import UsersModel as u
 
 
 from src.utils.exceptions import (
@@ -72,5 +73,8 @@ class MastersUtils:
         return set(ids_request).issubset(ids_base)
     
     def query_for_masters_in_salon(self, id_salon : int):
-        return select(m.id).join(ms).where(ms.c.id_salon == id_salon)
+        return (select(m,u.name)
+                .join(ms)
+                .join(u, u.id == m.id_user)
+                .where(ms.c.id_salon == id_salon))
 master_utils = MastersUtils()

@@ -24,7 +24,8 @@ from src.utils.exceptions import (
     IdSpecializationNoFound,
     IncorectDate,
     IncorectData,
-    SalonNoFound
+    SalonNoFound,
+    MasterInSalonNoFound
 )
 from src.models.enum import UserRoleEnum, MasterRequestStatusEnum
 
@@ -35,8 +36,10 @@ class MastersService(BaseService):
         return await self.db.master.get_master_by_id(id = id)
 
     async def masters_in_salon(self, id_salon : int):
-        return await self.db.salon.masters_in_salon(id_salon=id_salon)
-
+        result = await self.db.master.get_masters_in_salon(id_salon=id_salon)
+        if not result:
+            raise MasterInSalonNoFound
+        return result
 
     async def add_day_off(self, id : int, data : DayOffCreateSchema ):
         try:

@@ -77,6 +77,8 @@ class IdSpecializationNoFound(NoFound):
 class MasterNoFound(NoFound):
     detail = "Мастер не найден."
 
+class MasterInSalonNoFound(MasterNoFound):
+    detail = "В выбранном салоне нет мастеров"
 
 class ApplicationNoFound(NoFound):
     detail = "Заявка не найдена."

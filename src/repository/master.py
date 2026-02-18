@@ -14,7 +14,8 @@ from src.schemas.masters import (
     WorkDaySchema,
     SpecializationMasterRelationSchema,
     MasterSpecializationSchema,
-    MasterDetailSchema
+    MasterDetailSchema,
+    MasterWithNameSchema
 )
 from src.schemas.dayoff import DayOffSchema
 
@@ -24,9 +25,18 @@ class MasterRepository(BaseOrmRep):
     model = MasterModel
     schema = MasterSchema
 
-    async def get_masters_in_salon(self,id_salon):
-        # utils 
-        pass
+    async def get_masters_in_salon(self,id_salon) -> MasterWithNameSchema:
+        query = master_utils.query_for_masters_in_salon(id_salon)
+        result = await self.session.execute(query)
+        return [
+            MasterWithNameSchema.model_validate(
+            {
+                'master' : self.schema.model_validate(row['MasterModel'],from_attributes=True),
+                'name' : row['name']
+            },from_attributes=True)
+                for row in result.mappings().all()
+                ]
+        
 
     async def get_master_by_id(self,id : int):
         query = (select(self.model)
