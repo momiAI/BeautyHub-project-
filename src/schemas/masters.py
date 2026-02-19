@@ -15,19 +15,22 @@ class MasterSchema(BaseModel):
     face_image : str
     bio: str
 
-class MasterWithNameSchema(BaseModel):
-    master : MasterSchema
-    name : str
-
 class MasterSpecializationCreateSchema(BaseModel):
     name : str
+    
+class MasterWithSpecializationSchema(MasterSchema):
+    specialization: list[MasterSpecializationCreateSchema]
 
+class MasterWithNameSchema(BaseModel):
+    master : MasterWithSpecializationSchema
+    name : str
 
 class MasterDetailSchema(MasterSchema):
     specialization: list[MasterSpecializationCreateSchema] | None = None
     work_days: list[WorkDaySchema] | None = None
     day_offs: list[DayOffCreateSchema] | None =None
     salons : list[SalonToMasterSchema] | None = None
+
 
 class MasterBioUpdateSchema(BaseModel):
     bio : str

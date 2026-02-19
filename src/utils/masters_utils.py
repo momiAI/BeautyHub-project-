@@ -1,5 +1,6 @@
 from datetime import datetime, timezone,date
-from sqlalchemy import select 
+from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 
 from src.models.master import MasterModel as m
@@ -76,5 +77,9 @@ class MastersUtils:
         return (select(m,u.name)
                 .join(ms)
                 .join(u, u.id == m.id_user)
-                .where(ms.c.id_salon == id_salon))
+                .where(ms.c.id_salon == id_salon)
+                .options(
+                    selectinload(m.specialization)
+                )
+                )
 master_utils = MastersUtils()

@@ -15,6 +15,7 @@ from src.schemas.masters import (
     SpecializationMasterRelationSchema,
     MasterSpecializationSchema,
     MasterDetailSchema,
+    MasterWithSpecializationSchema,
     MasterWithNameSchema
 )
 from src.schemas.dayoff import DayOffSchema
@@ -31,7 +32,7 @@ class MasterRepository(BaseOrmRep):
         return [
             MasterWithNameSchema.model_validate(
             {
-                'master' : self.schema.model_validate(row['MasterModel'],from_attributes=True),
+                'master' : MasterWithSpecializationSchema.model_validate(row['MasterModel'],from_attributes=True),
                 'name' : row['name']
             },from_attributes=True)
                 for row in result.mappings().all()

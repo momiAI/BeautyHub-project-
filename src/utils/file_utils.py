@@ -21,6 +21,8 @@ class FilesUtils:
 
 
     def max_count_images(self) -> list[int]:
+        if not self.path_in_portfolio_dir.exists():
+            self.path_in_portfolio_dir.mkdir(parents=True, exist_ok=True)
         images_in_dir = list(self.path_in_portfolio_dir.iterdir())
         list_count = sorted([int(image.name.split('_')[0]) for image in images_in_dir])
         free_count = sorted([free for free in range(10) if free not in list_count])
@@ -64,7 +66,6 @@ class FilesUtils:
         for image in list_images:
             name_image = f"{list_count[count]}_{self.id_salon}_{self.city}.{image.filename.split('.')[-1]}"
             image_path = self.path_in_portfolio_dir / name_image
-            self.path_in_portfolio_dir.mkdir(parents=True,exist_ok=True)
             with open(image_path,'wb') as buffer:
                 shutil.copyfileobj(image.file,buffer)
             count += 1
