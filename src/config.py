@@ -18,8 +18,11 @@ class Settings(BaseSettings):
     REFRESH_SECRET_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int
 
-    ADMIN_PHONE: str
+    ADMIN_LOGIN : str
     ADMIN_PASSWORD: str
+    ADMIN_SECRET_WORD : str
+    ADMIN_PHONE : str
+
 
     BASE_IDR : Path = Path(__file__).parent.parent
     FACE_IMAGE_DIR : Path = BASE_IDR / 'static' / 'face_images'

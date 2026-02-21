@@ -1,3 +1,4 @@
+from src.repository.admin import AdminRepository, AdminVerifyRepository
 from src.repository.users import UsersRepository
 from src.repository.master import (
     MasterRepository,
@@ -20,6 +21,9 @@ class DbManager:
         self.session = self.session_factory()
 
         self.user = UsersRepository(self.session)
+
+        self.admin = AdminRepository(self.session)
+        self.admin_verify = AdminVerifyRepository(self.session)
 
         self.client = ClientRepository(self.session)
         self.client_rating = ClientRatingRelationRepository(self.session)

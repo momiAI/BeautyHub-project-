@@ -1,5 +1,6 @@
 import re
 import jwt
+import uuid
 from datetime import datetime, timedelta, timezone
 from pwdlib import PasswordHash
 
@@ -51,6 +52,9 @@ class UserUtils:
             return digits
         else:
             raise IncorectPhone
+
+    def create_verify_token(self, data : dict):
+        return uuid.uuid4
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None):
         to_encode = data.copy()
