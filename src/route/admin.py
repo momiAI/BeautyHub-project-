@@ -1,14 +1,16 @@
-from fastapi import APIRouter,Body, HTTPException,UploadFile,File,Form
+from fastapi import APIRouter,Body, HTTPException,UploadFile,File,Form,Response
 
 from src.route.dependency import AdminDep,DbDep
 from src.schemas.masters import MasterSpecializationCreateSchema
 from src.schemas.service import ServiceCreateSchemas
+from src.schemas.admin import AdminLoginSchema
 from src.service.masters import MastersService
 from src.service.salon import SalonService
 from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
-from src.utils.exceptions import ApplicationApproved, ApplicationNoFound, ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.service.admin import AdminService
+from src.utils.exceptions import ApplicationApproved,ApplicationNoFound,AdminNoFound,IncorectNowPassword ,ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -134,3 +136,16 @@ async def update_salons(db : DbDep,
         raise HTTPException(status_code=404, detail=exc.detail)
     except ImageInDirNoFound as exc:
         raise HTTPException(status_code=404, detail=exc.detail)
+
+
+@router.post(path='/login', summary='Логирование для админов')
+async def login_admin(db : DbDep,response : Response,data_login : AdminLoginSchema):
+    try:
+        result = await AdminService(db).login_admins(data_login)
+        await db.commit()
+        response.set_cookie('verify_token', result)
+        return {'message' : 'OK'}
+    except AdminNoFound:
+        raise HTTPException(status_code=400, detail='Что то пошло не так')
+    except IncorectNowPassword:
+        raise HTTPException(status_code=400, detail='Что совершилось не так')

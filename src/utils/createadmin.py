@@ -17,7 +17,7 @@ async def create_admin():
         stmt_admin = insert(AdminModel).values(
             login=settings.ADMIN_LOGIN,
             hashed_password=user_utils.hasheed_password(settings.ADMIN_PASSWORD),
-            hashed_secret_word=user_utils.hasheed_password
+            hashed_secret_word=user_utils.hasheed_password(settings.ADMIN_SECRET_WORD)
         ).returning(AdminModel)
         result_stmt_admin = await session.execute(stmt_admin)
         admin = result_stmt_admin.scalar_one()

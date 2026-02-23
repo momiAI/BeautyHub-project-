@@ -52,8 +52,9 @@ class UserUtils:
             return digits
         else:
             raise IncorectPhone
-
-    def create_verify_token(self, data : dict):
+    
+    @property
+    def create_verify_token(self):
         return uuid.uuid4
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None):
@@ -79,7 +80,7 @@ class UserUtils:
         )
         return encoded_jwt
 
-    def verify_password(self, plain_password, hashed_password):
+    def verify_password(self, plain_password, hashed_password) -> bool:
         return password_hash.verify(plain_password, hashed_password)
 
     def hasheed_password(self, password):

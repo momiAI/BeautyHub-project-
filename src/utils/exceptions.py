@@ -53,6 +53,9 @@ class UserUniqueError(UniqueError):
 class NoFound(CustomException):
     detail = "Объект не найден"
 
+class AdminNoFound(NoFound):
+    detail = "Админ не найден"
+
 class ForeignKeyNoFound(NoFound):
     detail = 'Внешний ключ не найден' 
 
