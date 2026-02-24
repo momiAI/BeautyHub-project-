@@ -19,11 +19,10 @@ async def create_admin():
             hashed_password=user_utils.hasheed_password(settings.ADMIN_PASSWORD),
             hashed_secret_word=user_utils.hasheed_password(settings.ADMIN_SECRET_WORD)
         ).returning(AdminModel)
-        result_stmt_admin = await session.execute(stmt_admin)
-        admin = result_stmt_admin.scalar_one()
+        await session.execute(stmt_admin)
         stmt_client = insert(ClientModel).values(
             phone = settings.ADMIN_PHONE,
-            id_user = admin.id,
+            id_user = None,
             is_guest = False,
             rating = 0.0
 

@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String,Integer,ForeignKey
+from sqlalchemy import String,Integer,ForeignKey,DateTime
 from sqlalchemy.orm import Mapped,mapped_column
 
 from src.database import Base
@@ -20,6 +20,6 @@ class AdminVerifyModel(Base):
     id : Mapped[int] = mapped_column(Integer,primary_key=True)
     admin_id = mapped_column(Integer,ForeignKey('admin.id', ondelete = 'CASCADE'), nullable=False)
     verify_token : Mapped[str]
-    expire_at : Mapped[datetime]
+    expire_at : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=True)
     attempts : Mapped[int] = mapped_column(default=0)
-    last_attempt : Mapped[datetime]
+    last_attempt : Mapped[datetime] = mapped_column(DateTime(timezone=True),nullable=True)

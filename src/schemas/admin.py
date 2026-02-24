@@ -10,16 +10,24 @@ class AdminSchema(BaseModel):
     role : str = UserRoleEnum.ADMIN.value
     hashed_secret_word : str
 
-class AdminCreateVerifySchema(BaseModel):
+class AdminUpdateAttemptsSchema(BaseModel):
+    attempts : int
+
+class AdminCreateVerifySchema(AdminUpdateAttemptsSchema):
     admin_id : int
     verify_token : str
     expire_at : datetime
-    attempts : int
     last_attempt : datetime
 
 
 class AdminVerifySchema(AdminCreateVerifySchema):
     id : int
+
+
+class AdminVerifyAndPasswordsWithLoginSchema(BaseModel):
+    admin : AdminVerifySchema
+    hashed_password : str
+    hashed_secret_word : str
     
 
 class AdminLoginSchema(BaseModel):

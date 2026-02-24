@@ -55,7 +55,7 @@ class UserUtils:
     
     @property
     def create_verify_token(self):
-        return uuid.uuid4
+        return uuid.uuid4().hex
 
     def create_access_token(self, data: dict, expires_delta: timedelta | None = None):
         to_encode = data.copy()

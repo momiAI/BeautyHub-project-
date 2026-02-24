@@ -10,7 +10,7 @@ from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
 from src.service.admin import AdminService
-from src.utils.exceptions import ApplicationApproved,ApplicationNoFound,AdminNoFound,IncorectNowPassword ,ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.utils.exceptions import ApplicationApproved,ApplicationNoFound,AdminNoFound,IncorectNowPassword ,RequestCooldownError,ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -148,4 +148,7 @@ async def login_admin(db : DbDep,response : Response,data_login : AdminLoginSche
     except AdminNoFound:
         raise HTTPException(status_code=400, detail='Что то пошло не так')
     except IncorectNowPassword:
+        await db.commit()
         raise HTTPException(status_code=400, detail='Что совершилось не так')
+    except RequestCooldownError:
+        raise HTTPException(status_code=400, detail='Повторите позже')
