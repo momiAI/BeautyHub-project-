@@ -8,11 +8,20 @@ class TooMany(CustomException):
     '''Базовый класс для наследия ошибок, когда превышается допустимый лимит'''
     detail = ''
 
+class SessionExpired(CustomException):
+    detail = 'Сессия истекла'
+
 class TooManyFiles(TooMany):
     detail = 'Превышено допустимое количество файлов'
 
 class IncorectData(CustomException):
     detail = "Неверные данные"
+
+class IncorectSecretWord(IncorectData):
+    detail = 'Неверное секретное значение'
+
+class IncorectToken(IncorectData):
+    detail = 'Неверный токен'
 
 class IncorectTypeFile(IncorectData):
     detail = "Неверный формат файла"

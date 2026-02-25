@@ -1,8 +1,8 @@
 from src.service.base import BaseService
-from src.schemas.admin import AdminLoginSchema,AdminVerifySchema,AdminCreateVerifySchema,AdminUpdateAttemptsSchema
+from src.schemas.admin import AdminLoginSchema,AdminVerifySchema,AdminCreateVerifySchema,AdminUpdateAttemptsSchema,AdminUpdateSchema
 from src.utils.users_utils import user_utils
 from src.utils.date_utils import date_utils
-from src.utils.exceptions import AdminNoFound, IncorectNowPassword, NoFound,RequestCooldownError
+from src.utils.exceptions import AdminNoFound, IncorectNowPassword, NoFound,RequestCooldownError, SessionExpired,IncorectToken,IncorectSecretWord
 
 class AdminService(BaseService):
 
@@ -18,20 +18,41 @@ class AdminService(BaseService):
 
 
     async def login_admins(self,data_login : AdminLoginSchema) -> str:
-        admin_verify = await self.db.admin_verify.get_full_admin(data_login.login)
+        admin_verify = await self.db.admin_verify.get_full_admin(login = data_login.login)
         if admin_verify.admin.attempts == 5:
             raise RequestCooldownError
         if admin_verify is None:
             try:
                 admin = await self.db.admin.get_object(login = data_login.login)
+                admin_verify = await self._create_verify_obj(admin.id)
             except NoFound:
                 raise AdminNoFound
-            admin_verify = await self.db.admin_verify.get_full_admin(admin.login)
         if not user_utils.verify_password(data_login.password,admin_verify.hashed_password):
-            await self.db.admin_verify.update(admin_verify.admin.id, AdminUpdateAttemptsSchema(attempts=admin_verify.admin.attempts + 1))
+            await self.db.admin_verify.update(admin_verify.admin.id, AdminUpdateSchema(attempts=admin_verify.admin.attempts + 1, last_attempt=date_utils.now))
             raise IncorectNowPassword
-        return admin_verify.verify_token
+        else:
+            token = admin_verify.admin.verify_token
+            await self.db.admin_verify.update(admin_verify.admin.id,AdminUpdateSchema(
+                verify_token=token,
+                last_attempt=date_utils.now,
+                attempts=0,
+                expire_at=date_utils.create_expire_token
+                ) )
+            return token
         
+
+    async def verify_secret_word(self,token : str,secret_word : str):
+        admin_verify = await self.db.admin_verify.get_full_admin(verify_token = token)
+        if admin_verify is None:
+            raise AdminNoFound
+        if date_utils.now > admin_verify.admin.expire_at:
+            raise SessionExpired
+        if token != admin_verify.admin.verify_token:
+            raise IncorectToken
+        if not user_utils.verify_password(secret_word,admin_verify.hashed_password):
+            raise IncorectSecretWord
+        await self.db.admin_verify.update(admin_verify.admin.admin_id, AdminUpdateAttemptsSchema(attempts=0))
+
 
 
 

@@ -1,4 +1,4 @@
-from fastapi import APIRouter,Body, HTTPException,UploadFile,File,Form,Response
+from fastapi import APIRouter,Body, HTTPException,UploadFile,File,Form,Response,Request
 
 from src.route.dependency import AdminDep,DbDep
 from src.schemas.masters import MasterSpecializationCreateSchema
@@ -10,7 +10,7 @@ from src.service.masters_specializations import MasterSpecializationService
 from src.service.service import ServService
 from src.service.users import UsersService
 from src.service.admin import AdminService
-from src.utils.exceptions import ApplicationApproved,ApplicationNoFound,AdminNoFound,IncorectNowPassword ,RequestCooldownError,ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, UserNoFound,IdSpecializationNoFound,ServiceNoFound
+from src.utils.exceptions import ApplicationApproved,ApplicationNoFound,AdminNoFound,IncorectNowPassword, IncorectSecretWord, IncorectToken ,RequestCooldownError,ImageInDbNoFound, ImageInDirNoFound, IncorectTypeFile, IncorectTypeImage, SalonNoFound, SessionExpired, UserNoFound,IdSpecializationNoFound,ServiceNoFound
 from src.models.enum import CityEnum
 
 router = APIRouter(prefix="/admin",tags=["Админ ручки"])
@@ -152,3 +152,22 @@ async def login_admin(db : DbDep,response : Response,data_login : AdminLoginSche
         raise HTTPException(status_code=400, detail='Что совершилось не так')
     except RequestCooldownError:
         raise HTTPException(status_code=400, detail='Повторите позже')
+    
+@router.post(path='/login/verify', summary='Проверка секретного слова')
+async def verify_secret_word(db : DbDep,request : Request,secret_word : str = Body()):
+    token = request.cookies.get('verify_token')
+    if not token:
+        raise HTTPException(status_code=400, detail='Что то пошло не так...')
+    try: 
+        await AdminService(db).verify_secret_word(token, secret_word)
+    except AdminNoFound:
+        raise HTTPException(status_code=400,detail='Путь не найден')
+    except SessionExpired:
+        raise HTTPException(status_code=400,detail='Путь истёк')
+    except IncorectToken:
+        raise HTTPException(status_code=400,detail='Неверный путь')
+    except IncorectSecretWord:
+        raise HTTPException(status_code=400,detail='Неверный путеводитель')
+
+    await db.commit()
+    return {'message' : 'OK'}

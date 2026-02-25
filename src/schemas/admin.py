@@ -13,6 +13,12 @@ class AdminSchema(BaseModel):
 class AdminUpdateAttemptsSchema(BaseModel):
     attempts : int
 
+class AdminUpdateSchema(BaseModel):
+    verify_token : str  | None = None
+    attempts : int | None = None
+    expire_at : datetime | None = None
+    last_attempt : datetime | None = None
+
 class AdminCreateVerifySchema(AdminUpdateAttemptsSchema):
     admin_id : int
     verify_token : str

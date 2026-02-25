@@ -16,11 +16,11 @@ class AdminVerifyRepository(BaseOrmRep):
     model = AdminVerifyModel
     schema = AdminVerifySchema
 
-    async def get_full_admin(self,login_admin) -> AdminVerifyAndPasswordsWithLoginSchema | None:
+    async def get_full_admin(self,**kwargs) -> AdminVerifyAndPasswordsWithLoginSchema | None:
         query = (
             select(self.model,AdminModel.hashed_password,AdminModel.hashed_secret_word)
                  .join(AdminModel, self.model.admin_id == AdminModel.id) 
-                 .where(AdminModel.login == login_admin)
+                 .filter_by(**kwargs)
                  )
         result = await self.session.execute(query)
         row = result.mappings().one_or_none()
