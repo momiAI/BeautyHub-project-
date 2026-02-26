@@ -17,11 +17,19 @@ class AdminVerifyRepository(BaseOrmRep):
     schema = AdminVerifySchema
 
     async def get_full_admin(self,**kwargs) -> AdminVerifyAndPasswordsWithLoginSchema | None:
-        query = (
-            select(self.model,AdminModel.hashed_password,AdminModel.hashed_secret_word)
-                 .join(AdminModel, self.model.admin_id == AdminModel.id) 
-                 .filter_by(**kwargs)
-                 )
+        token = kwargs.pop('verify_token',None)
+        if token is None:
+            query = (
+                select(self.model,AdminModel.hashed_password,AdminModel.hashed_secret_word)
+                    .join(AdminModel, self.model.admin_id == AdminModel.id) 
+                    .filter_by(**kwargs)
+                    )
+        else:
+            query = (
+                    select(self.model, AdminModel.hashed_password,AdminModel.hashed_secret_word)
+                        .join(AdminModel, self.model.admin_id == AdminModel.id)
+                        .filter(self.model.verify_token == token) 
+                     )
         result = await self.session.execute(query)
         row = result.mappings().one_or_none()
         if row is not None:

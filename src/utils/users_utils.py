@@ -108,6 +108,9 @@ class UserUtils:
 
         return access_token,refresh_token
 
+    def create_access_admin_token(self,admin_id) -> str:
+        return self.create_access_token({'admin_id' : admin_id},expires_delta=timedelta(hours=8))
+
 
     
 user_utils = UserUtils()

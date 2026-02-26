@@ -19,8 +19,11 @@ class AdminService(BaseService):
 
     async def login_admins(self,data_login : AdminLoginSchema) -> str:
         admin_verify = await self.db.admin_verify.get_full_admin(login = data_login.login)
-        if admin_verify.admin.attempts == 5:
-            raise RequestCooldownError
+        if admin_verify.admin.attempts >= 5:
+            if date_utils.check_last_atempt(admin_verify.admin.last_attempt):
+                await self.db.admin_verify.update(admin_verify.admin.id, AdminUpdateSchema(attempts=0, last_attempt=date_utils.now))
+            else:
+                raise RequestCooldownError
         if admin_verify is None:
             try:
                 admin = await self.db.admin.get_object(login = data_login.login)
@@ -41,7 +44,7 @@ class AdminService(BaseService):
             return token
         
 
-    async def verify_secret_word(self,token : str,secret_word : str):
+    async def verify_secret_word(self,token : str,secret_word : str) -> str:
         admin_verify = await self.db.admin_verify.get_full_admin(verify_token = token)
         if admin_verify is None:
             raise AdminNoFound
@@ -49,9 +52,10 @@ class AdminService(BaseService):
             raise SessionExpired
         if token != admin_verify.admin.verify_token:
             raise IncorectToken
-        if not user_utils.verify_password(secret_word,admin_verify.hashed_password):
+        if not user_utils.verify_password(secret_word,admin_verify.hashed_secret_word):
             raise IncorectSecretWord
-        await self.db.admin_verify.update(admin_verify.admin.admin_id, AdminUpdateAttemptsSchema(attempts=0))
+        await self.db.admin_verify.update(admin_verify.admin.id, AdminUpdateAttemptsSchema(attempts=0))
+        return user_utils.create_access_admin_token(admin_verify.admin.admin_id)
 
 
 
