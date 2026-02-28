@@ -1,10 +1,8 @@
-from sqlalchemy import select,join
-from sqlalchemy.exc import NoResultFound
+from sqlalchemy import select
 
 from src.repository.base import BaseOrmRep
 from src.models.admin import AdminModel,AdminVerifyModel
 from src.schemas.admin import AdminSchema, AdminVerifySchema,AdminVerifyAndPasswordsWithLoginSchema
-from src.utils.exceptions import NoFound
 
 
 class AdminRepository(BaseOrmRep):

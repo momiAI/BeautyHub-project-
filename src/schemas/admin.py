@@ -33,7 +33,7 @@ class AdminVerifySchema(AdminCreateVerifySchema):
 class AdminVerifyAndPasswordsWithLoginSchema(BaseModel):
     admin : AdminVerifySchema
     hashed_password : str
-    hashed_secret_word : str
+    hashed_secret_word : str 
     
 
 class AdminLoginSchema(BaseModel):

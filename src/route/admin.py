@@ -154,7 +154,7 @@ async def login_admin(db : DbDep,response : Response,data_login : AdminLoginSche
         raise HTTPException(status_code=400, detail='Повторите позже')
     
 @router.post(path='/login/verify', summary='Проверка секретного слова')
-async def verify_secret_word(db : DbDep,request : Request,response : Response,secret_word : str = Body()):
+async def verify_secret_word(db : DbDep,request : Request,response : Response,secret_word : str = Body(embed=True)):
     token = request.cookies.get('verify_token')
     if not token:
         raise HTTPException(status_code=400, detail='Что то пошло не так...')
