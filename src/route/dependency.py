@@ -4,6 +4,7 @@ from pydantic import BaseModel
 
 from src.schemas.users import UserDepSchema
 from src.schemas.masters import MasterDepSchema
+from src.schemas.admin import AdminDepSchema
 from src.utils.exceptions import IncorectToken, TokenTimeIsOver,IncorectPhone
 from src.utils.users_utils import user_utils
 from src.utils.db_manager import DbManager
@@ -52,6 +53,18 @@ def user_dependency(role: UserRoleEnum | None = None):
 
     return get_user
 
+async def check_admin(request : Request) -> bool:
+    try:
+        token = request.cookies.get('admin_token')
+        if token:
+            user_utils.decode_token(token)
+            return True
+        else:
+            raise HTTPException(status_code=401,detail='Пользователь не авторизирован')
+    except IncorectToken:
+        raise HTTPException(status_code=401, detail="Неверный токен")
+    except TokenTimeIsOver:
+        raise HTTPException(status_code=401, detail="Срок токена истек")
 
 async def get_db():
     async with DbManager(async_session_maker) as db:
@@ -61,7 +74,7 @@ async def get_db():
 DbDep = Annotated[DbManager, Depends(get_db)]
 MeDep = Annotated[UserDepSchema, Depends(user_dependency())]
 UserDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.CLIENT))]
-AdminDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.ADMIN))]
+AdminDep = Annotated[bool, Depends(check_admin)]
 MasterDep = Annotated[UserDepSchema, Depends(user_dependency(UserRoleEnum.MASTER))]
 AministratorDep = Annotated[UserDepSchema,Depends(user_dependency(UserRoleEnum.ADMINISTRATOR))]
 PhoneDep = Annotated[str,Depends(valide_phone)]

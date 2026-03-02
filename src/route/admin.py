@@ -169,6 +169,10 @@ async def verify_secret_word(db : DbDep,request : Request,response : Response,se
     except IncorectSecretWord:
         raise HTTPException(status_code=400,detail='Неверный путеводитель')
 
-    response.set_cookie('access_token',access_token)
+    response.set_cookie('admin_token',access_token)
     await db.commit()
     return {'message' : 'OK'}
+
+@router.get(path='/check-auth', summary='Проверка авторизирован ли админ')
+async def check_auth(admin : AdminDep):
+    pass

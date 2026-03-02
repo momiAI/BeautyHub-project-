@@ -39,3 +39,8 @@ class AdminVerifyAndPasswordsWithLoginSchema(BaseModel):
 class AdminLoginSchema(BaseModel):
     login : str
     password : str
+
+
+class AdminDepSchema(BaseModel):
+    admin_id : int
+    exp : int 

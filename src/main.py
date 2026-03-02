@@ -19,7 +19,8 @@ from src.route.salons import router as salon_router
 app = FastAPI()
 
 origins = [
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
 ]
 
 app.add_middleware(
